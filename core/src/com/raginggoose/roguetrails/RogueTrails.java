@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-//This is where the game code goes
+//This is where the game code goes.
 
 public class RogueTrails extends ApplicationAdapter {
 	SpriteBatch batch;
