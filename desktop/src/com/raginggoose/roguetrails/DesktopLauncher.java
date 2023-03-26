@@ -10,6 +10,7 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
 		config.setTitle("Rogue Trails");
+		config.setResizable(false);
 		new Lwjgl3Application(new RogueTrails(), config);
 	}
 }
