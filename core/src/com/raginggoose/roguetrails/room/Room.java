@@ -1,5 +1,7 @@
 package com.raginggoose.roguetrails.room;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
 import java.awt.*;
 
 public abstract class Room {
@@ -22,7 +24,7 @@ public abstract class Room {
     public abstract RoomType getRoomType();
 
     //to draw
-    public abstract void draw(int x, int y, Graphics g); //to draw room
+    public abstract void draw(int x, int y, ShapeRenderer shape); //to draw room
 
 }
 

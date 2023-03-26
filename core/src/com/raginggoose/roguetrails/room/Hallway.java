@@ -1,6 +1,7 @@
 package com.raginggoose.roguetrails.room;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.awt.*;
 
@@ -125,7 +126,7 @@ public class Hallway extends Room {
     }
 
     @Override
-    public void draw(int x, int y, Graphics g) {
+    public void draw(int x, int y, ShapeRenderer shape) {
 
     }
 }
