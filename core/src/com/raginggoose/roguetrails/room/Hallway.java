@@ -127,6 +127,6 @@ public class Hallway extends Room {
 
     @Override
     public void draw(int x, int y, ShapeRenderer shape) {
-
+        shape.rect(x, y, w, h);
     }
 }

@@ -11,6 +11,8 @@ import com.raginggoose.roguetrails.Player;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.room.Cell;
+import com.raginggoose.roguetrails.room.Hallway;
+import com.raginggoose.roguetrails.room.Orientation;
 
 public class GameScreen implements Screen {
     private final RogueTrails game;
@@ -38,6 +40,35 @@ public class GameScreen implements Screen {
 
     }
 
+    public Dungeon makeDungeon() {
+        Cell start = new Cell(300,300);
+        Hallway hall1 = new Hallway(500,80, Orientation.HORIZONTAL);
+        Cell cellA = new Cell(300,300);
+        Hallway hall2 = new Hallway(80,500, Orientation.VERTICAL);
+        Hallway hall3 = new Hallway(500,80, Orientation.HORIZONTAL);
+        Cell cellB = new Cell(300,300);
+        Cell cellD = new Cell(100,100);
+        Hallway hall4 = new Hallway(500,80, Orientation.HORIZONTAL);
+        Cell cellC = new Cell(1000,1500);
+        Cell cellE = new Cell(80,80);
+
+        start.setEast(hall1);
+        hall1.setEast(cellA);
+        cellA.setSouth(hall2);
+        hall2.setSouth(cellE);
+        cellE.setWest(hall3);
+        hall3.setWest(cellB);
+        cellB.setSouth(cellD);
+        cellE.setEast(hall4);
+        hall4.setEast(cellC);
+
+        Dungeon dungeon = new Dungeon(start, null);
+        return dungeon;
+
+    }
+
+    Dungeon dun = makeDungeon();
+
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
@@ -45,15 +76,7 @@ public class GameScreen implements Screen {
         shape.setProjectionMatrix(cam.combined);
         shape.begin(ShapeRenderer.ShapeType.Line);
 
-        //GAME VARIABLES
-        Cell startRoom = new Cell(300, 300);
-        Cell room2 = new Cell(200, 80);
-        Cell room3 = new Cell(60, 60);
-        startRoom.setEast(room2);
-        room2.setNorth(room3);
-        Dungeon dungeon = new Dungeon(startRoom, null);
-
-        dungeon.draw(10, 10, shape);
+        dun.draw(10,10,shape);
 
         testPlayer.draw(shape);
         shape.end();
