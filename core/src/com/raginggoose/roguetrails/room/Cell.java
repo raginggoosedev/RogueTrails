@@ -1,6 +1,8 @@
 package com.raginggoose.roguetrails.room;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
 import java.awt.*; //replace with libgdx library later
 
 public class Cell extends Room {
@@ -84,8 +86,7 @@ public class Cell extends Room {
         return TYPE;
     }
 
-    @Override
-    public void draw(int x, int y, Graphics g) {
-        g.fillRect(x,y,w,h);
+    public void draw(int x, int y, ShapeRenderer shape) {
+        shape.rect(x, y, w, h);
     }
 }
