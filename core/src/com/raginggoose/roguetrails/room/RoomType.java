@@ -1,4 +1,4 @@
-package com.raginggoose.roguetrails.dungeon;
+package com.raginggoose.roguetrails.room;
 
 public enum RoomType {
     CELL,

@@ -1,4 +1,4 @@
-package com.raginggoose.roguetrails.dungeon;
+package com.raginggoose.roguetrails.room;
 
 import com.badlogic.gdx.Gdx;
 
