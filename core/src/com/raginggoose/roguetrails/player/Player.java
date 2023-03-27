@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 @Deprecated
 public class Player {
     private int x, y;
-    public final static int SIZE = 10;
+    public final static int SIZE = 32;
 
     public Player(int x, int y) {
         this.x = x;
