@@ -25,7 +25,7 @@ public class GameScreen implements Screen {
     private final ShapeRenderer shape;
 
     private final OrthographicCamera cam;
-    Dungeon dun = makeDungeon();
+    public static Dungeon dun = makeDungeon();
 
     public GameScreen(RogueTrails game) {
         this.game = game;
@@ -45,7 +45,7 @@ public class GameScreen implements Screen {
 
     }
 
-    public Dungeon makeDungeon() {
+    public static Dungeon makeDungeon() {
         Cell start = new Cell(300,300);
         Hallway hall1 = new Hallway(300,80, Orientation.HORIZONTAL);
         Cell cellA = new Cell(300,300);
@@ -73,45 +73,13 @@ public class GameScreen implements Screen {
 
     }
 
-    public Direction checkCollision(Player player, Room room) {
-
-        int px1 = player.getX();
-        int px2 = player.getX() + player.SIZE;
-        int py1 = player.getY();
-        int py2 = player.getY() + player.SIZE;
-
-        int leftBound = room.getX();
-        int rightBound = room.getX() + room.getWidth();
-        int lowerBound = room.getY();
-        int upperBound = room.getY() + room.getHeight();
-
-        if (px1 <= leftBound) {
-            if (room.getWest() == null) return Direction.LEFT;
-            if (py1 < room.getWest().getY() || py2 > room.getWest().getY() + room.getWest().getHeight()) return Direction.LEFT;
-        }
-        if (px2 >= rightBound) {
-            if (room.getEast() == null) return Direction.RIGHT;
-            if (py1 < room.getEast().getY() || py2 > room.getEast().getY() + room.getEast().getHeight()) return Direction.RIGHT;
-        }
-        if (py1 <= lowerBound) {
-            if (room.getSouth() == null) return Direction.DOWN;
-            if (px1 < room.getSouth().getX() || px2 > room.getSouth().getX() + room.getSouth().getWidth()) return Direction.DOWN;
-        }
-        if (py2 >= upperBound) {
-            if (room.getNorth() == null) return Direction.UP;
-            if (px1 < room.getNorth().getX() || px2 > room.getNorth().getX() + room.getNorth().getWidth()) return Direction.UP;
-        }
-
-        return null;
-
-    }
-
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
         // Draw a small rectangle
         shape.setProjectionMatrix(cam.combined);
         shape.begin(ShapeRenderer.ShapeType.Line);
+
 
         dun.draw(shape);
         shape.end();
