@@ -1,9 +1,9 @@
 package com.raginggoose.roguetrails.room;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-import java.awt.*;
 
 public class Hallway extends Room {
 
@@ -12,6 +12,9 @@ public class Hallway extends Room {
     private final int h;
     private final RoomType TYPE = RoomType.HALLWAY;
     private final Orientation ORIENTATION;
+    private int x = 0;
+    private int y = 0;
+    public String name;
 
     //Adjacent rooms
     private Room NORTH = null;
@@ -99,24 +102,32 @@ public class Hallway extends Room {
     @Override
     public void setNorth(Room room) {
         if (ORIENTATION == Orientation.VERTICAL)
+            room.setX(this.x + this.w/2 - room.getWidth()/2);
+            room.setY(this.y + this.h);
             NORTH = room;
     }
 
     @Override
     public void setEast(Room room) {
         if (ORIENTATION == Orientation.HORIZONTAL)
+            room.setX(this.x + this.w);
+            room.setY(this.y + this.h/2 - room.getWidth()/2);
             EAST = room;
     }
 
     @Override
     public void setSouth(Room room) {
         if (ORIENTATION == Orientation.VERTICAL)
+            room.setX(this.x + this.w/2 - room.getWidth()/2);
+            room.setY(this.y-room.getHeight());
             SOUTH = room;
     }
 
     @Override
     public void setWest(Room room) {
         if (ORIENTATION == Orientation.HORIZONTAL)
+            room.setX(this.x-room.getWidth());
+            room.setY(this.y + this.h/2 - room.getWidth()/2);
             WEST = room;
     }
 
@@ -126,7 +137,40 @@ public class Hallway extends Room {
     }
 
     @Override
-    public void draw(int x, int y, ShapeRenderer shape) {
+    //public void draw(int x, int y, ShapeRenderer shape) {
+    public void draw(ShapeRenderer shape) {
         shape.rect(x, y, w, h);
+    }
+
+    @Override
+    public int getX() {
+        return x;
+    }
+
+    @Override
+    public int getY() {
+        return y;
+    }
+
+    @Override
+    public void setX(int x) {
+        this.x=x;
+    }
+
+    @Override
+    public void setY(int y) {
+        this.y=y;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void moveX(int dx) {
+        x+=dx;
+    }
+
+    public void moveY(int dy) {
+        y+=dy;
     }
 }

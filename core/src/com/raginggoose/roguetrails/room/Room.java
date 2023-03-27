@@ -24,7 +24,15 @@ public abstract class Room {
     public abstract RoomType getRoomType();
 
     //to draw
-    public abstract void draw(int x, int y, ShapeRenderer shape); //to draw room
+    //public abstract void draw(int x, int y, ShapeRenderer shape); //to draw room
+    public abstract void draw(ShapeRenderer shape); //to draw room
+    public abstract int getX();
+    public abstract int getY();
+    public abstract void setX(int x);
+    public abstract void setY(int y);
+    public abstract String getName();
+    public abstract void moveX(int dx);
+    public abstract void moveY(int dy);
 
 }
 
