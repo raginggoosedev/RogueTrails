@@ -34,10 +34,11 @@ public class GameScreen implements Screen {
         shape = new ShapeRenderer();
 
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f);
+        cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         ecsEngine = new ECSEngine(shape, cam);
         ecsEngine.createPlayer(10, 10, 32, 32, 0, Color.BLUE);
+        ecsEngine.createEnemy(20, 20, 32, 32, 0, Color.RED);
     }
 
     @Override

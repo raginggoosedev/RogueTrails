@@ -56,6 +56,9 @@ public class PlayerMovementSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         TransformComponent transform = Mapper.transformMapper.get(entity);
+        PlayerComponent playerComponent = Mapper.playerMapper.get(entity);
+
+        float speed = playerComponent.speed;
 
         int px = (int) transform.position.x;
         int py = (int) transform.position.y;
