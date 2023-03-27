@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.raginggoose.roguetrails.player.Direction;
 import com.raginggoose.roguetrails.player.Player;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
@@ -31,7 +32,7 @@ public class GameScreen implements Screen {
 
         shape = new ShapeRenderer();
 
-        testPlayer = new Player(0, 0);
+        testPlayer = new Player(145, 145);
 
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth() /2f, Gdx.graphics.getHeight() /2f);
@@ -81,6 +82,39 @@ public class GameScreen implements Screen {
 
     }
 
+    public Direction checkCollision(Player player, Room room) {
+
+        int px1 = player.getX();
+        int px2 = player.getX() + player.SIZE;
+        int py1 = player.getY();
+        int py2 = player.getY() + player.SIZE;
+
+        int leftBound = room.getX();
+        int rightBound = room.getX() + room.getWidth();
+        int lowerBound = room.getY();
+        int upperBound = room.getY() + room.getHeight();
+
+        if (px1 <= leftBound) {
+            if (room.getWest() == null) return Direction.LEFT;
+            if (py1 < room.getWest().getY() || py2 > room.getWest().getY() + room.getWest().getHeight()) return Direction.LEFT;
+        }
+        if (px2 >= rightBound) {
+            if (room.getEast() == null) return Direction.RIGHT;
+            if (py1 < room.getEast().getY() || py2 > room.getEast().getY() + room.getEast().getHeight()) return Direction.RIGHT;
+        }
+        if (py1 <= lowerBound) {
+            if (room.getSouth() == null) return Direction.DOWN;
+            if (px1 < room.getSouth().getX() || px2 > room.getSouth().getX() + room.getSouth().getWidth()) return Direction.DOWN;
+        }
+        if (py2 >= upperBound) {
+            if (room.getNorth() == null) return Direction.UP;
+            if (px1 < room.getNorth().getX() || px2 > room.getNorth().getX() + room.getNorth().getWidth()) return Direction.UP;
+        }
+
+        return null;
+
+    }
+
     Dungeon dun = makeDungeon();
 
     @Override
@@ -97,7 +131,7 @@ public class GameScreen implements Screen {
         shape.end();
 
         // Move player, camera moves with player
-        testPlayer.move();
+        testPlayer.move(checkCollision(testPlayer, dun.getCurrentRoom(testPlayer)));
         cam.position.set(new Vector2(testPlayer.getX(), testPlayer.getY()), 0);
         cam.update();
     }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 @Deprecated
 public class Player {
     private int x, y;
+    public final static int SIZE = 10;
 
     public Player(int x, int y) {
         this.x = x;
@@ -18,7 +19,7 @@ public class Player {
     }
 
     public void draw(ShapeRenderer s) {
-        s.rect(x, y, 10, 10, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE);
+        s.rect(x, y, SIZE, SIZE, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE);
     }
 
     public void setLocation(int x, int y) {
@@ -34,16 +35,16 @@ public class Player {
         return y;
     }
 
-    public void move() {
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+    public void move(Direction dir) {
+        if (Gdx.input.isKeyPressed(Input.Keys.W) && dir != Direction.UP) {
             y+=1;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.S) && dir != Direction.DOWN) {
             y-=1;
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.A) && dir != Direction.LEFT) {
             x-=1;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.D) && dir != Direction.RIGHT) {
             x+=1;
         }
     }
