@@ -106,12 +106,6 @@ public class GameScreen implements Screen {
 
     }
 
-    Dungeon dun = makeDungeon();
-
-        return new Dungeon(start, null);
-
-    }
-
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
@@ -119,7 +113,7 @@ public class GameScreen implements Screen {
         shape.setProjectionMatrix(cam.combined);
         shape.begin(ShapeRenderer.ShapeType.Line);
 
-        dun.draw(10, 10, shape);
+        dun.draw(shape);
         shape.end();
 
         //TODO add collision system to ecs
