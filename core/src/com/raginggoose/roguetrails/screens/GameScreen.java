@@ -6,12 +6,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.raginggoose.roguetrails.player.Direction;
 import com.raginggoose.roguetrails.player.Player;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
+import com.raginggoose.roguetrails.ecs.ECSEngine;
 import com.raginggoose.roguetrails.room.Cell;
 import com.raginggoose.roguetrails.room.Hallway;
 import com.raginggoose.roguetrails.room.Orientation;
@@ -20,11 +20,12 @@ import com.raginggoose.roguetrails.room.Room;
 public class GameScreen implements Screen {
     private final RogueTrails game;
     private final SpriteBatch batch;
-    private final Player testPlayer;
+    private final ECSEngine ecsEngine;
 
     private final ShapeRenderer shape;
 
     private final OrthographicCamera cam;
+    Dungeon dun = makeDungeon();
 
     public GameScreen(RogueTrails game) {
         this.game = game;
@@ -32,10 +33,11 @@ public class GameScreen implements Screen {
 
         shape = new ShapeRenderer();
 
-        testPlayer = new Player(145, 145);
-
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, Gdx.graphics.getWidth() /2f, Gdx.graphics.getHeight() /2f);
+        cam.setToOrtho(false, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f);
+
+        ecsEngine = new ECSEngine(shape, cam);
+        ecsEngine.createPlayer(10, 10, 32, 32, 0, Color.BLUE);
     }
 
     @Override
@@ -66,17 +68,6 @@ public class GameScreen implements Screen {
         cellB.setSouth(cellD);
         cellE.setEast(hall4);
         hall4.setEast(cellC);
-
-
-        start.name= "start";
-        cellA.name="cellA";
-        cellB.name="cellB";
-        cellC.name="cellC";
-        cellD.name="cellD";
-        hall1.name="hall1";
-        hall2.name="hall2";
-        hall3.name="hall3";
-        hall4.name="hall4";
 
         return dungeon;
 
@@ -117,6 +108,10 @@ public class GameScreen implements Screen {
 
     Dungeon dun = makeDungeon();
 
+        return new Dungeon(start, null);
+
+    }
+
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
@@ -124,16 +119,11 @@ public class GameScreen implements Screen {
         shape.setProjectionMatrix(cam.combined);
         shape.begin(ShapeRenderer.ShapeType.Line);
 
-        dun.draw(shape);
-
-
-        testPlayer.draw(shape);
+        dun.draw(10, 10, shape);
         shape.end();
 
-        // Move player, camera moves with player
-        testPlayer.move(checkCollision(testPlayer, dun.getCurrentRoom(testPlayer)));
-        cam.position.set(new Vector2(testPlayer.getX(), testPlayer.getY()), 0);
-        cam.update();
+        //TODO add collision system to ecs
+        ecsEngine.update(delta);
     }
 
     @Override

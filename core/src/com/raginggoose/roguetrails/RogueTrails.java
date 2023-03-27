@@ -18,6 +18,7 @@ import java.util.EnumMap;
  * @version 1.0, 2023/03/26
  */
 public class RogueTrails extends Game {
+    public static final boolean DEBUG = true;
     private final String TAG = this.getClass().getSimpleName();
     private SpriteBatch batch;
     private EnumMap<ScreenType, Screen> screenCache;
