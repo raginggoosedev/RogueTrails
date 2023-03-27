@@ -18,15 +18,18 @@ public class PlayerMovementSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         TransformComponent transform = Mapper.transformMapper.get(entity);
+        PlayerComponent playerComponent = Mapper.playerMapper.get(entity);
+
+        float speed = playerComponent.speed;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W))
-            transform.position.add(0, 1, 0);
+            transform.position.add(0, speed, 0);
         else if (Gdx.input.isKeyPressed(Input.Keys.S))
-            transform.position.add(0, -1, 0);
+            transform.position.add(0, -speed, 0);
 
         if (Gdx.input.isKeyPressed(Input.Keys.A))
-            transform.position.add(-1, 0, 0);
+            transform.position.add(-speed, 0, 0);
         else if (Gdx.input.isKeyPressed(Input.Keys.D))
-            transform.position.add(1, 0, 0);
+            transform.position.add(speed, 0, 0);
     }
 }

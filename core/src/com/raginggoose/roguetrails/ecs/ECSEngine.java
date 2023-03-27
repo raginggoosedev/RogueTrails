@@ -11,6 +11,7 @@ import com.raginggoose.roguetrails.ecs.components.EnemyComponent;
 import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
 import com.raginggoose.roguetrails.ecs.systems.DebugRenderingSystem;
+import com.raginggoose.roguetrails.ecs.systems.EnemyMovementSystem;
 import com.raginggoose.roguetrails.ecs.systems.PlayerCameraSystem;
 import com.raginggoose.roguetrails.ecs.systems.PlayerMovementSystem;
 
@@ -24,6 +25,8 @@ public class ECSEngine extends PooledEngine {
         this.addSystem(new PlayerMovementSystem());
 
         this.addSystem(new PlayerCameraSystem(cam));
+
+        this.addSystem(new EnemyMovementSystem());
     }
 
     public void createPlayer(int x, int y, int w, int h, int drawOrder, Color debugColour) {
@@ -31,6 +34,7 @@ public class ECSEngine extends PooledEngine {
 
         // Player Component
         PlayerComponent playerComponent = this.createComponent(PlayerComponent.class);
+        playerComponent.speed = 2.0f;
         player.add(playerComponent);
 
         // Transform Component
@@ -57,6 +61,7 @@ public class ECSEngine extends PooledEngine {
         // Enemy Component
         EnemyComponent enemyComponent = this.createComponent(EnemyComponent.class);
         enemyComponent.player = player;
+        enemyComponent.speed = 1.0f;
         enemy.add(enemyComponent);
 
         // Transform Component
@@ -66,5 +71,14 @@ public class ECSEngine extends PooledEngine {
         transformComponent.width = w;
         transformComponent.height = h;
         enemy.add(transformComponent);
+
+        // Debug Component
+        if (RogueTrails.DEBUG) {
+            DebugComponent debugComponent = this.createComponent(DebugComponent.class);
+            debugComponent.color = debugColour;
+            enemy.add(debugComponent);
+        }
+
+        this.addEntity(enemy);
     }
 }
