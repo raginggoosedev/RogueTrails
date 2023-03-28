@@ -1,5 +1,7 @@
 package com.raginggoose.roguetrails.item;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
 public abstract class Item {
     public abstract int getX();
     public abstract int getY();
@@ -9,4 +11,5 @@ public abstract class Item {
     public abstract int getHeight();
     public abstract void setWidth(int w);
     public abstract void setHeight(int h);
+    public abstract void draw(ShapeRenderer shape);
 }

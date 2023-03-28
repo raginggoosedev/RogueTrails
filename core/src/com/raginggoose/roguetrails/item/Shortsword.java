@@ -1,5 +1,7 @@
 package com.raginggoose.roguetrails.item;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
 public class Shortsword extends Melee {
 
     private int x;
@@ -66,6 +68,11 @@ public class Shortsword extends Melee {
     @Override
     public void setHeight(int h) {
         this.h = h;
+    }
+
+    @Override
+    public void draw(ShapeRenderer shape) {
+        shape.rect(x,y,w,h);
     }
 
     @Override

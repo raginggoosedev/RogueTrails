@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.raginggoose.roguetrails.item.Broadsword;
+import com.raginggoose.roguetrails.item.Item;
+import com.raginggoose.roguetrails.item.Shortsword;
 import com.raginggoose.roguetrails.player.Direction;
 import com.raginggoose.roguetrails.player.Player;
 import com.raginggoose.roguetrails.RogueTrails;
@@ -74,6 +77,20 @@ public class GameScreen implements Screen {
 
     }
 
+    //temporary method to test spawning items
+    //will rewrite more elegantly
+    public Item[] spawnItems(Room room, int x, int y) {
+        int rx = room.getX();
+        int ry = room.getY();
+        Shortsword shortsword = new Shortsword(rx+200,ry+100);
+        Broadsword broad = new Broadsword(rx+250,ry+250);
+
+        Item items[] = {shortsword, broad};
+
+        return items;
+    }
+
+
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
@@ -81,8 +98,14 @@ public class GameScreen implements Screen {
         shape.setProjectionMatrix(cam.combined);
         shape.begin(ShapeRenderer.ShapeType.Line);
 
+        Item items[]  = spawnItems(dun.getStart(), 200,100);
 
         dun.draw(shape);
+
+        for (int i = 0; i < items.length; i++) {
+            items[i].draw(shape);
+        }
+
         shape.end();
 
         //TODO add collision system to ecs
