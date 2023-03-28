@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.raginggoose.roguetrails.RogueTrails;
+import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.components.DebugComponent;
 import com.raginggoose.roguetrails.ecs.components.EnemyComponent;
 import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
@@ -21,8 +22,6 @@ public class ECSEngine extends PooledEngine {
     public ECSEngine(ShapeRenderer s, OrthographicCamera cam) {
         if (RogueTrails.DEBUG)
             this.addSystem(new DebugRenderingSystem(s));
-
-        this.addSystem(new PlayerMovementSystem());
 
         this.addSystem(new PlayerCameraSystem(cam));
 
