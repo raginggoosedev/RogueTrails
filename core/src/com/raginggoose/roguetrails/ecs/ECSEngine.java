@@ -33,11 +33,12 @@ public class ECSEngine extends PooledEngine {
 
     /**
      * Creates the player entity
-     * @param x the player's x coordinate
-     * @param y the player's y coordinate
-     * @param w the player's width
-     * @param h the player's height
-     * @param drawOrder the layer that the player is drawn on (the order)
+     *
+     * @param x           the player's x coordinate
+     * @param y           the player's y coordinate
+     * @param w           the player's width
+     * @param h           the player's height
+     * @param drawOrder   the layer that the player is drawn on (the order)
      * @param debugColour what colour the debug box should be drawn as
      */
     public void createPlayer(int x, int y, int w, int h, int drawOrder, Color debugColour) {
@@ -66,6 +67,16 @@ public class ECSEngine extends PooledEngine {
         this.addEntity(player);
     }
 
+    /**
+     * Creates an enemy entity with the given parameters
+     *
+     * @param x           the enemy's x coordinate
+     * @param y           the enemy's y coordinate
+     * @param w           the enemy's width
+     * @param h           the enemy's height
+     * @param drawOrder   the enemy's layer to be drawn on
+     * @param debugColour the colour assigned to the enemy for debug rendering
+     */
     public void createEnemy(int x, int y, int w, int h, int drawOrder, Color debugColour) {
         Entity enemy = this.createEntity();
 

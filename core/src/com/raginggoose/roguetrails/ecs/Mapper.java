@@ -7,8 +7,9 @@ import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
 
 public class Mapper {
-    public static final ComponentMapper<TransformComponent> transformMapper = ComponentMapper.getFor(TransformComponent.class);
-    public static final ComponentMapper<DebugComponent> debugMapper = ComponentMapper.getFor(DebugComponent.class);
-    public static final ComponentMapper<EnemyComponent> enemyMapper = ComponentMapper.getFor(EnemyComponent.class);
-    public static final ComponentMapper<PlayerComponent> playerMapper = ComponentMapper.getFor(PlayerComponent.class);
+    // Component mappers for all the components available as statics
+    public static final ComponentMapper<TransformComponent> TRANSFORM_MAPPER = ComponentMapper.getFor(TransformComponent.class);
+    public static final ComponentMapper<DebugComponent> DEBUG_MAPPER = ComponentMapper.getFor(DebugComponent.class);
+    public static final ComponentMapper<EnemyComponent> ENEMY_MAPPER = ComponentMapper.getFor(EnemyComponent.class);
+    public static final ComponentMapper<PlayerComponent> PLAYER_MAPPER = ComponentMapper.getFor(PlayerComponent.class);
 }
