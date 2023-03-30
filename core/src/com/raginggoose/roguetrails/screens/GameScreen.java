@@ -11,8 +11,6 @@ import com.raginggoose.roguetrails.item.Broadsword;
 import com.raginggoose.roguetrails.item.Item;
 import com.raginggoose.roguetrails.item.Shortsword;
 import com.raginggoose.roguetrails.ecs.systems.PlayerMovementSystem;
-import com.raginggoose.roguetrails.player.Direction;
-import com.raginggoose.roguetrails.player.Player;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.ECSEngine;
