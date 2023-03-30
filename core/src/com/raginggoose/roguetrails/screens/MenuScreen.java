@@ -1,8 +1,19 @@
 package com.raginggoose.roguetrails.screens;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.raginggoose.roguetrails.RogueTrails;
 
 public class MenuScreen implements Screen {
+    private final Stage stage;
+    public MenuScreen(RogueTrails game) {
+        stage = new Stage();
+        Table table = new Table();
+
+
+    }
+
     @Override
     public void show() {
 
@@ -35,6 +46,6 @@ public class MenuScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        stage.dispose();
     }
 }

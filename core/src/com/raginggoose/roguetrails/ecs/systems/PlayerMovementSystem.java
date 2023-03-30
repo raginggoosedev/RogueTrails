@@ -12,12 +12,13 @@ import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
 import com.raginggoose.roguetrails.player.Direction;
 import com.raginggoose.roguetrails.room.Room;
-import com.raginggoose.roguetrails.screens.GameScreen;
 
 public class PlayerMovementSystem extends IteratingSystem {
+    private final Dungeon dun;
 
-    public PlayerMovementSystem() {
+    public PlayerMovementSystem(Dungeon dun) {
         super(Family.all(PlayerComponent.class).get());
+        this.dun = dun;
     }
 
     private Direction checkCollision(float x, float y, float w, float h, Room room) {
@@ -63,7 +64,6 @@ public class PlayerMovementSystem extends IteratingSystem {
 
         Vector3 pos = transform.position;
 
-        Dungeon dun = GameScreen.dun;
         Direction dir = checkCollision(pos.x, pos.y, transform.width, transform.height, dun.getCurrentRoom(pos.x, pos.y));
 
         if (Gdx.input.isKeyPressed(Input.Keys.W) && dir != Direction.UP)

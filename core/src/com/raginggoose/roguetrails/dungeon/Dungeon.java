@@ -1,6 +1,8 @@
 package com.raginggoose.roguetrails.dungeon;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.raginggoose.roguetrails.ecs.ECSEngine;
 import com.raginggoose.roguetrails.player.Player;
 import com.raginggoose.roguetrails.room.Room;
 
