@@ -1,6 +1,8 @@
 package com.raginggoose.roguetrails.dungeon;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.raginggoose.roguetrails.ecs.ECSEngine;
 import com.raginggoose.roguetrails.player.Player;
 import com.raginggoose.roguetrails.room.Room;
 
@@ -100,13 +102,13 @@ public class Dungeon implements Cloneable {
         }
     }
 
-    public Room getCurrentRoom(Player player) {
+    public Room getCurrentRoom(float x, float y) {
 
         ArrayList<Room> roomList = new ArrayList<>();
         putIntoArray(START, roomList);
 
         for (Room r : roomList) {
-            if (inRoom(player, r)) return r;
+            if (inRoom(x, y, r)) return r;
         }
 
         return null;
@@ -132,13 +134,9 @@ public class Dungeon implements Cloneable {
 
 
 
-    private boolean inRoom(Player player, Room room) {
+    private boolean inRoom(float playerX, float playerY, Room room) {
 
         if (room == null) return false;
-
-        //player
-        int px = player.getX();
-        int py = player.getY();
 
         //room
         int x1 = room.getX();
@@ -146,7 +144,7 @@ public class Dungeon implements Cloneable {
         int y1 = room.getY();
         int y2 = y1 + room.getHeight();
 
-        return (px >= x1 && px <= x2 && py >= y1 && py <= y2);
+        return (playerX >= x1 && playerX <= x2 && playerY >= y1 && playerY <= y2);
     }
 
 }
