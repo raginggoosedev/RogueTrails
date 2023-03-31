@@ -18,4 +18,25 @@ public class ItemComponent implements Component, Pool.Poolable {
     public void reset() {
         type = -1;
     }
+
+    public String toString() {
+        switch (type) {
+            case SHORT_SWORD:
+                return "Short Sword";
+            case BROAD_SWORD:
+                return "Broad Sword";
+            case ARTIFACT:
+                return "Artifact";
+            case SPEED_BUFF:
+                return "Speed Buff";
+            case REGENERATION_BUFF:
+                return "Regeneration Buff";
+            case STRENGTH_BUFF:
+                return "Strength Buff";
+            case STAMINA_BUFF:
+                return "Stamina Buf";
+            default:
+                return "Null Item";
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.raginggoose.roguetrails.ecs;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -15,6 +16,7 @@ import com.raginggoose.roguetrails.ecs.systems.PlayerCameraSystem;
  * Handles all the game's entities
  */
 public class ECSEngine extends PooledEngine {
+    public final static String TAG = ECSEngine.class.getSimpleName();
     public static final Color ENEMY_DEBUG_COLOUR = Color.RED;
     public static final Color PLAYER_DEBUG_COLOUR = Color.BLUE;
     public static final Color ITEM_DEBUG_COLOUR = Color.GREEN;
@@ -40,12 +42,16 @@ public class ECSEngine extends PooledEngine {
      * @param drawOrder   the layer that the player is drawn on (the order)
      */
     public void createPlayer(int x, int y, int w, int h, int drawOrder) {
+        StringBuilder sBuild = new StringBuilder();
+        sBuild.append("----------------------\n");
+        sBuild.append("New PLAYER entity\n");
         player = this.createEntity();
 
         // Player Component
         PlayerComponent playerComponent = this.createComponent(PlayerComponent.class);
         playerComponent.speed = 2.0f;
         player.add(playerComponent);
+        sBuild.append("Player Speed: ").append(playerComponent.speed).append("\n");
 
         // Transform Component
         TransformComponent transformComponent = this.createComponent(TransformComponent.class);
@@ -54,15 +60,20 @@ public class ECSEngine extends PooledEngine {
         transformComponent.width = w;
         transformComponent.height = h;
         player.add(transformComponent);
+        sBuild.append("Player Position: ").append(transformComponent.position.toString()).append("\n");
+        sBuild.append("Player Width & Height: ").append(transformComponent.width).append(", ").append(transformComponent.height).append("\n");
 
         // Debug Component
         if (RogueTrails.DEBUG) {
             DebugComponent debugComponent = this.createComponent(DebugComponent.class);
             debugComponent.color = PLAYER_DEBUG_COLOUR;
             player.add(debugComponent);
+            sBuild.append("Player Debug Color: ").append(PLAYER_DEBUG_COLOUR).append("\n");
         }
 
         this.addEntity(player);
+        sBuild.append("----------------------------------\n");
+        Gdx.app.log(TAG, sBuild.toString());
     }
 
     /**
@@ -76,12 +87,16 @@ public class ECSEngine extends PooledEngine {
      */
     public void createEnemy(int x, int y, int w, int h, int drawOrder) {
         Entity enemy = this.createEntity();
+        StringBuilder sBuild = new StringBuilder();
+        sBuild.append("----------------------\n");
+        sBuild.append("New ENEMY entity\n");
 
         // Enemy Component
         EnemyComponent enemyComponent = this.createComponent(EnemyComponent.class);
         enemyComponent.player = player;
         enemyComponent.speed = 1.0f;
         enemy.add(enemyComponent);
+        sBuild.append("Enemy Speed: ").append(enemyComponent.speed).append("\n");
 
         // Transform Component
         TransformComponent transformComponent = this.createComponent(TransformComponent.class);
@@ -90,24 +105,36 @@ public class ECSEngine extends PooledEngine {
         transformComponent.width = w;
         transformComponent.height = h;
         enemy.add(transformComponent);
+        sBuild.append("Enemy Position: ").append(transformComponent.position.toString()).append("\n");
+        sBuild.append("Enemy Width & Height: ").append(transformComponent.width).append(", ").append(transformComponent.height).append("\n");
 
         // Debug Component
         if (RogueTrails.DEBUG) {
             DebugComponent debugComponent = this.createComponent(DebugComponent.class);
             debugComponent.color = ENEMY_DEBUG_COLOUR;
             enemy.add(debugComponent);
+            sBuild.append("Enemy Debug Color: ").append(ENEMY_DEBUG_COLOUR).append("\n");
         }
 
         this.addEntity(enemy);
+
+        sBuild.append("----------------------------------\n");
+
+        Gdx.app.debug(TAG, sBuild.toString());
     }
 
     public void createItem(int x, int y, int w, int h, int drawOrder, int type) {
         Entity item = this.createEntity();
 
+        StringBuilder sBuild = new StringBuilder();
+        sBuild.append("----------------------\n");
+        sBuild.append("New ITEM entity\n");
+
         // Item Component
         ItemComponent itemComponent = this.createComponent(ItemComponent.class);
         itemComponent.type = type;
         item.add(itemComponent);
+        sBuild.append("Item Type: ").append(itemComponent).append("\n");
 
         // Transform Component
         TransformComponent transformComponent = this.createComponent(TransformComponent.class);
@@ -116,12 +143,15 @@ public class ECSEngine extends PooledEngine {
         transformComponent.width = w;
         transformComponent.height = h;
         item.add(transformComponent);
+        sBuild.append(itemComponent).append(" Position: ").append(transformComponent.position.toString()).append("\n");
+        sBuild.append(itemComponent).append(" Width & Height: ").append(transformComponent.width).append(", ").append(transformComponent.height).append("\n");
 
         // Debug Component
         if (RogueTrails.DEBUG) {
             DebugComponent debugComponent = this.createComponent(DebugComponent.class);
             debugComponent.color = ITEM_DEBUG_COLOUR;
             item.add(debugComponent);
+            sBuild.append(itemComponent).append(" Debug Color: ").append(ITEM_DEBUG_COLOUR).append("\n");
         }
 
         switch (type) {
@@ -132,6 +162,11 @@ public class ECSEngine extends PooledEngine {
                 meleeComponent.speed = 10;
                 meleeComponent.coolDown = 3;
                 item.add(meleeComponent);
+
+                sBuild.append(itemComponent).append(" Damage: ").append(meleeComponent.damage).append("\n");
+                sBuild.append(itemComponent).append(" Range: ").append(meleeComponent.range).append("\n");
+                sBuild.append(itemComponent).append(" Speed: ").append(meleeComponent.speed).append("\n");
+                sBuild.append(itemComponent).append(" Cool-down: ").append(meleeComponent.coolDown).append("\n");
                 break;
             case ItemComponent.BROAD_SWORD:
                 meleeComponent = this.createComponent(MeleeComponent.class);
@@ -140,6 +175,11 @@ public class ECSEngine extends PooledEngine {
                 meleeComponent.speed = 5;
                 meleeComponent.coolDown = 5;
                 item.add(meleeComponent);
+
+                sBuild.append(itemComponent).append(" Damage: ").append(meleeComponent.damage).append("\n");
+                sBuild.append(itemComponent).append(" Range: ").append(meleeComponent.range).append("\n");
+                sBuild.append(itemComponent).append(" Speed: ").append(meleeComponent.speed).append("\n");
+                sBuild.append(itemComponent).append(" Cool-down: ").append(meleeComponent.coolDown).append("\n");
                 break;
             case ItemComponent.SPEED_BUFF:
             case ItemComponent.REGENERATION_BUFF:
@@ -148,9 +188,14 @@ public class ECSEngine extends PooledEngine {
                 PerkComponent perkComponent = this.createComponent(PerkComponent.class);
                 perkComponent.timeLimit = 5.0f;
                 item.add(perkComponent);
+
+                sBuild.append(itemComponent).append(" Limit: ").append(perkComponent.timeLimit).append("\n");
                 break;
         }
 
         this.addEntity(item);
+
+        sBuild.append("----------------------------------\n");
+        Gdx.app.debug(TAG, sBuild.toString());
     }
 }
