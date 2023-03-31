@@ -33,19 +33,11 @@ public class ECSEngine extends PooledEngine {
     /**
      * Creates the player entity
      *
-<<<<<<< HEAD
-     * @param x         the player's x coordinate
-     * @param y         the player's y coordinate
-     * @param w         the player's width
-     * @param h         the player's height
-     * @param drawOrder the layer that the player is drawn on (the order)
-=======
      * @param x           the player's x coordinate
      * @param y           the player's y coordinate
      * @param w           the player's width
      * @param h           the player's height
      * @param drawOrder   the layer that the player is drawn on (the order)
->>>>>>> origin/main
      */
     public void createPlayer(int x, int y, int w, int h, int drawOrder) {
         player = this.createEntity();
