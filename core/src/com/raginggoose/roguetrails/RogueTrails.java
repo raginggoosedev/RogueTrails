@@ -25,9 +25,15 @@ public class RogueTrails extends Game {
 
     @Override
     public void create() {
+        if (DEBUG)
+            Gdx.app.log(TAG, "------ Game is in DEBUG! ------");
+
         batch = new SpriteBatch();
 
+        // Use an enum map to cache screens by their screen types
         screenCache = new EnumMap<>(ScreenType.class);
+
+        // Set the first screen to type GAME
         setScreen(ScreenType.GAME);
     }
 
