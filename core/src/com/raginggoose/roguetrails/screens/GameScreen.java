@@ -2,10 +2,14 @@ package com.raginggoose.roguetrails.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
+
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.raginggoose.roguetrails.loader.AssetLoader;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.ECSEngine;
@@ -14,16 +18,18 @@ import com.raginggoose.roguetrails.ecs.systems.PlayerMovementSystem;
 import com.raginggoose.roguetrails.room.Cell;
 import com.raginggoose.roguetrails.room.Hallway;
 import com.raginggoose.roguetrails.room.Orientation;
-import com.raginggoose.roguetrails.room.Room;
 
 public class GameScreen implements Screen {
     public final Dungeon dun;
     private final RogueTrails game;
     private final SpriteBatch batch;
     private final ECSEngine ecsEngine;
+    private final AssetManager assetManager;
+    private final AssetLoader assetLoader;
     private final ShapeRenderer shape;
     private final OrthographicCamera cam;
 
+    public GameScreen(RogueTrails game, AssetLoader assetLoader) {
     /**
      * Create a new game screen to display and play the game
      *
@@ -32,14 +38,15 @@ public class GameScreen implements Screen {
     public GameScreen(RogueTrails game) {
         this.game = game;
         this.batch = game.getBatch();
-
+        assetManager = game.getAssetManager().manager;
+        this.assetLoader = assetLoader;
         shape = new ShapeRenderer();
 
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        ecsEngine = new ECSEngine(shape, cam);
-        ecsEngine.createPlayer(10, 10, 32, 32, 0);
+        ecsEngine = new ECSEngine(shape, cam, assetManager);
+        ecsEngine.createPlayer(10, 10, 32, 32, 0, Color.BLUE, assetManager);
 
         dun = makeDungeon();
 
@@ -97,6 +104,7 @@ public class GameScreen implements Screen {
         // Draw a small rectangle
         shape.setProjectionMatrix(cam.combined);
         shape.begin(ShapeRenderer.ShapeType.Line);
+        assetLoader.queueAssets();
 
         dun.draw(shape);
 
