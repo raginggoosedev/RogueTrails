@@ -13,12 +13,15 @@ public class ItemComponent implements Component, Pool.Poolable {
     public static final int STAMINA_BUFF = 6;
 
     public int type = -1;
+    public boolean collected = false;
 
     @Override
     public void reset() {
         type = -1;
+        collected = false;
     }
 
+    @Override
     public String toString() {
         switch (type) {
             case SHORT_SWORD:
