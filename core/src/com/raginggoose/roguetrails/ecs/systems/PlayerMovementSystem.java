@@ -10,7 +10,7 @@ import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
-import com.raginggoose.roguetrails.player.Direction;
+import com.raginggoose.roguetrails.room.Direction;
 import com.raginggoose.roguetrails.room.Room;
 
 /**

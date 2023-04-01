@@ -1,5 +1,6 @@
 package com.raginggoose.roguetrails;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -25,8 +26,10 @@ public class RogueTrails extends Game {
 
     @Override
     public void create() {
-        if (DEBUG)
+        if (DEBUG) {
             Gdx.app.log(TAG, "------ Game is in DEBUG! ------");
+            Gdx.app.setLogLevel(Application.LOG_DEBUG);
+        }
 
         batch = new SpriteBatch();
 

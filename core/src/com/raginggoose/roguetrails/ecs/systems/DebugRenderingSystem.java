@@ -48,6 +48,10 @@ public class DebugRenderingSystem extends SortedIteratingSystem {
         // Draw each entity as a rectangle of their given colour
         shape.begin(ShapeRenderer.ShapeType.Line);
         for (Entity e : new Array.ArrayIterator<>(renderQueue)) {
+            if (Mapper.RENDER_MAPPER.get(e) != null && !Mapper.RENDER_MAPPER.get(e).shouldRender) {
+                continue;
+            }
+
             TransformComponent transformComponent = Mapper.TRANSFORM_MAPPER.get(e);
             Color c = Mapper.DEBUG_MAPPER.get(e).color;
             shape.rect(transformComponent.position.x, transformComponent.position.y, transformComponent.width, transformComponent.height, c, c, c, c);

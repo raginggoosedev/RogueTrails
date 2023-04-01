@@ -1,4 +1,4 @@
-package com.raginggoose.roguetrails.player;
+package com.raginggoose.roguetrails.room;
 
 public enum Direction {
     RIGHT,
