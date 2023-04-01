@@ -2,42 +2,43 @@ package com.raginggoose.roguetrails.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.raginggoose.roguetrails.player.Direction;
-import com.raginggoose.roguetrails.player.Player;
+import com.raginggoose.roguetrails.loader.AssetLoader;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.ECSEngine;
 import com.raginggoose.roguetrails.room.Cell;
 import com.raginggoose.roguetrails.room.Hallway;
 import com.raginggoose.roguetrails.room.Orientation;
-import com.raginggoose.roguetrails.room.Room;
 
 public class GameScreen implements Screen {
     private final RogueTrails game;
     private final SpriteBatch batch;
     private final ECSEngine ecsEngine;
-
+    private final AssetManager assetManager;
+    private final AssetLoader assetLoader;
     private final ShapeRenderer shape;
 
     private final OrthographicCamera cam;
     public static Dungeon dun = makeDungeon();
 
-    public GameScreen(RogueTrails game) {
+    public GameScreen(RogueTrails game, AssetLoader assetLoader) {
         this.game = game;
         this.batch = game.getBatch();
-
+        assetManager = game.getAssetManager().manager;
+        this.assetLoader = assetLoader;
         shape = new ShapeRenderer();
 
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        ecsEngine = new ECSEngine(shape, cam);
-        ecsEngine.createPlayer(10, 10, 32, 32, 0, Color.BLUE);
+        ecsEngine = new ECSEngine(shape, cam, assetManager);
+        ecsEngine.createPlayer(10, 10, 32, 32, 0, Color.BLUE, assetManager);
         ecsEngine.createEnemy(20, 20, 32, 32, 0, Color.RED);
     }
 
@@ -80,7 +81,7 @@ public class GameScreen implements Screen {
         // Draw a small rectangle
         shape.setProjectionMatrix(cam.combined);
         shape.begin(ShapeRenderer.ShapeType.Line);
-
+        assetLoader.queueAssets();
 
         dun.draw(shape);
         shape.end();

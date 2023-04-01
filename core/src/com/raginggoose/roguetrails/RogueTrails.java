@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.raginggoose.roguetrails.loader.AssetLoader;
 import com.raginggoose.roguetrails.screens.ScreenType;
 
 import java.util.EnumMap;
@@ -21,12 +22,13 @@ public class RogueTrails extends Game {
     public static final boolean DEBUG = true;
     private final String TAG = this.getClass().getSimpleName();
     private SpriteBatch batch;
+    private AssetLoader assetManager;
     private EnumMap<ScreenType, Screen> screenCache;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
-
+        assetManager = new AssetLoader();
         screenCache = new EnumMap<>(ScreenType.class);
         setScreen(ScreenType.GAME);
     }
@@ -39,6 +41,7 @@ public class RogueTrails extends Game {
     @Override
     public void dispose() {
         batch.dispose();
+        assetManager.manager.dispose();
     }
 
     /**
@@ -72,5 +75,9 @@ public class RogueTrails extends Game {
 
     public SpriteBatch getBatch() {
         return batch;
+    }
+
+    public AssetLoader getAssetManager() {
+        return assetManager;
     }
 }

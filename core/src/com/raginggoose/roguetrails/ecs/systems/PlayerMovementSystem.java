@@ -1,5 +1,6 @@
 package com.raginggoose.roguetrails.ecs.systems;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
+import com.raginggoose.roguetrails.ecs.components.StateComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
 import com.raginggoose.roguetrails.player.Direction;
 import com.raginggoose.roguetrails.room.Room;
@@ -16,8 +18,11 @@ import com.raginggoose.roguetrails.screens.GameScreen;
 
 public class PlayerMovementSystem extends IteratingSystem {
 
+    private final ComponentMapper<StateComponent> stateMapper;
+
     public PlayerMovementSystem() {
         super(Family.all(PlayerComponent.class).get());
+        stateMapper = Mapper.stateMapper;
     }
 
     private Direction checkCollision(float x, float y, float w, float h, Room room) {
@@ -60,7 +65,7 @@ public class PlayerMovementSystem extends IteratingSystem {
         PlayerComponent playerComponent = Mapper.playerMapper.get(entity);
 
         float speed = playerComponent.speed;
-
+        final StateComponent stateComponent = stateMapper.get(entity);
         Vector3 pos = transform.position;
 
         Dungeon dun = GameScreen.dun;
@@ -75,5 +80,6 @@ public class PlayerMovementSystem extends IteratingSystem {
             transform.position.add(-speed, 0, 0);
         else if (Gdx.input.isKeyPressed(Input.Keys.D) && dir != Direction.RIGHT)
             transform.position.add(speed, 0, 0);
+            stateComponent.setState(StateComponent.STATE_RIGHT);
     }
 }
