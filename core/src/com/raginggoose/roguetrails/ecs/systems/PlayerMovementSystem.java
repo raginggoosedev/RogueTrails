@@ -12,16 +12,24 @@ import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
 import com.raginggoose.roguetrails.ecs.components.StateComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
-import com.raginggoose.roguetrails.player.Direction;
+import com.raginggoose.roguetrails.room.Direction;
 import com.raginggoose.roguetrails.room.Room;
-import com.raginggoose.roguetrails.screens.GameScreen;
 
+/**
+ * The system used to move the player based on user input
+ */
 public class PlayerMovementSystem extends IteratingSystem {
-
+    private final Dungeon dun;
     private final ComponentMapper<StateComponent> stateMapper;
-
-    public PlayerMovementSystem() {
+    
+    /**
+     * Creates a new player movement system with the dungeon as a parameter
+     *
+     * @param dun the dungeon to be used for collision detection
+     */
+    public PlayerMovementSystem(Dungeon dun) {
         super(Family.all(PlayerComponent.class).get());
+        this.dun = dun;
         stateMapper = Mapper.stateMapper;
     }
 
@@ -61,21 +69,19 @@ public class PlayerMovementSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        TransformComponent transform = Mapper.transformMapper.get(entity);
-        PlayerComponent playerComponent = Mapper.playerMapper.get(entity);
+        TransformComponent transform = Mapper.TRANSFORM_MAPPER.get(entity);
+        PlayerComponent playerComponent = Mapper.PLAYER_MAPPER.get(entity);
 
         float speed = playerComponent.speed;
         final StateComponent stateComponent = stateMapper.get(entity);
         Vector3 pos = transform.position;
 
-        Dungeon dun = GameScreen.dun;
         Direction dir = checkCollision(pos.x, pos.y, transform.width, transform.height, dun.getCurrentRoom(pos.x, pos.y));
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W) && dir != Direction.UP)
-            transform.position.add(0, speed, 0);
-        else if (Gdx.input.isKeyPressed(Input.Keys.S) && dir != Direction.DOWN)
-            transform.position.add(0, -speed, 0);
-
+        // Determine which input was pressed, then add or subtract from the position vector accordingly
+        if (Gdx.input.isKeyPressed(Input.Keys.W) && dir != Direction.UP) transform.position.add(0, speed, 0);
+        else if (Gdx.input.isKeyPressed(Input.Keys.S) && dir != Direction.DOWN) transform.position.add(0, -speed, 0);
+        
         if (Gdx.input.isKeyPressed(Input.Keys.A) && dir != Direction.LEFT)
             transform.position.add(-speed, 0, 0);
         else if (Gdx.input.isKeyPressed(Input.Keys.D) && dir != Direction.RIGHT)

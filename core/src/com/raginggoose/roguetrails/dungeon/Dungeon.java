@@ -1,10 +1,7 @@
 package com.raginggoose.roguetrails.dungeon;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.raginggoose.roguetrails.player.Player;
 import com.raginggoose.roguetrails.room.Room;
-
-import java.awt.*;
 import java.util.ArrayList;
 
 public class Dungeon implements Cloneable {
@@ -18,7 +15,7 @@ public class Dungeon implements Cloneable {
     private int y;
 
     //Constructor without position
-    public Dungeon (Room start, Room end) {
+    public Dungeon(Room start, Room end) {
         START = start;
         END = null; //TODO: make this not null
         x = 0;
@@ -26,7 +23,7 @@ public class Dungeon implements Cloneable {
     }
 
     //Constructor with position
-    public Dungeon (Room start, Room end, int x, int y) {
+    public Dungeon(Room start, Room end, int x, int y) {
         START = start;
         END = null; //TODO: make this not null
         this.x = x;
@@ -73,7 +70,7 @@ public class Dungeon implements Cloneable {
     }
 
     //public void draw (int x, int y, Room room, ShapeRenderer shape) {
-    public void draw (Room room, ShapeRenderer shape) {
+    public void draw(Room room, ShapeRenderer shape) {
         //get adjacent rooms
         Room north = room.getNorth();
         Room east = room.getEast();
@@ -88,7 +85,7 @@ public class Dungeon implements Cloneable {
         }
 
         if (east != null) {
-              draw(east, shape);
+            draw(east, shape);
         }
 
         if (south != null) {
@@ -96,7 +93,7 @@ public class Dungeon implements Cloneable {
         }
 
         if (west != null) {
-              draw(west, shape);
+            draw(west, shape);
         }
     }
 
@@ -129,7 +126,6 @@ public class Dungeon implements Cloneable {
             }
         }
     }
-
 
 
     private boolean inRoom(float playerX, float playerY, Room room) {

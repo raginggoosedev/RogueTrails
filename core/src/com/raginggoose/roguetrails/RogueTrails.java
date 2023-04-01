@@ -1,5 +1,6 @@
 package com.raginggoose.roguetrails;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -27,9 +28,18 @@ public class RogueTrails extends Game {
 
     @Override
     public void create() {
+        if (DEBUG) {
+            Gdx.app.log(TAG, "------ Game is in DEBUG! ------");
+            Gdx.app.setLogLevel(Application.LOG_DEBUG);
+        }
+
         batch = new SpriteBatch();
         assetManager = new AssetLoader();
+
+        // Use an enum map to cache screens by their screen types
         screenCache = new EnumMap<>(ScreenType.class);
+
+        // Set the first screen to type GAME
         setScreen(ScreenType.GAME);
     }
 
