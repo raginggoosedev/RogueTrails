@@ -7,18 +7,12 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.ecs.components.*;
-import com.raginggoose.roguetrails.ecs.systems.DebugRenderingSystem;
-import com.raginggoose.roguetrails.ecs.systems.EnemyMovementSystem;
-import com.raginggoose.roguetrails.ecs.systems.InteractionSystem;
-import com.raginggoose.roguetrails.ecs.systems.PlayerCameraSystem;
-import com.raginggoose.roguetrails.ecs.systems.PlayerMovementSystem;
-import com.raginggoose.roguetrails.loader.AssetLoader;
+import com.raginggoose.roguetrails.ecs.systems.*;
 import com.raginggoose.roguetrails.inventory.Inventory;
 
 /**
@@ -29,19 +23,18 @@ public class ECSEngine extends PooledEngine {
     public static final Color ENEMY_DEBUG_COLOUR = Color.RED;
     public static final Color PLAYER_DEBUG_COLOUR = Color.BLUE;
     public static final Color ITEM_DEBUG_COLOUR = Color.GREEN;
+    private final Entity player;
 
-    private Entity player;
-    private final AssetManager assetManager;
-    public ECSEngine(ShapeRenderer s, OrthographicCamera cam, AssetManager assetManager) {
+    public ECSEngine(ShapeRenderer s, SpriteBatch batch, OrthographicCamera cam) {
         if (RogueTrails.DEBUG)
             this.addSystem(new DebugRenderingSystem(s));
-            
-        this.assetManager = assetManager;
-        this.addSystem(new PlayerMovementSystem());
+
         this.addSystem(new PlayerCameraSystem(cam));
 
         this.addSystem(new EnemyMovementSystem());
-        
+
+        this.addSystem(new RenderingSystem(batch));
+
         player = this.createEntity();
         this.addSystem(new InteractionSystem(player));
     }
@@ -81,9 +74,17 @@ public class ECSEngine extends PooledEngine {
         // Render Component
         RenderComponent renderComponent = this.createComponent(RenderComponent.class);
         renderComponent.shouldRender = true;
+        renderComponent.region = new TextureRegion(new Texture("badlogic.jpg"));
         player.add(renderComponent);
 
+        // State Component
+        StateComponent stateComponent = this.createComponent(StateComponent.class);
+        stateComponent.setState(StateComponent.STATE_DOWN);
+        stateComponent.isLooping = true;
+        player.add(stateComponent);
 
+        // TODO animation
+    /*
         Texture playerMove = new Texture(Gdx.files.internal("playerSprites/playerMove.png"));
         final int FRAME_COLS = 10, FRAME_ROWS = 1;
         float frameSpeed = 0.05f;
@@ -99,11 +100,11 @@ public class ECSEngine extends PooledEngine {
         }
 
         Animation<TextureRegion> movementAnimation = new Animation<>(frameSpeed, movementFrames);
-
+*/
         // Animation Component
-        final AnimationComponent animationComponent = this.createComponent(AnimationComponent.class);
+        AnimationComponent animationComponent = this.createComponent(AnimationComponent.class);
 
-        animationComponent.animations.put(StateComponent.STATE_RIGHT, movementAnimation);
+        //animationComponent.animations.put(StateComponent.STATE_RIGHT, movementAnimation);
 
         // Debug Component
         if (RogueTrails.DEBUG) {

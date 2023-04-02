@@ -18,6 +18,7 @@ import com.raginggoose.roguetrails.ecs.systems.PlayerMovementSystem;
 import com.raginggoose.roguetrails.room.Cell;
 import com.raginggoose.roguetrails.room.Hallway;
 import com.raginggoose.roguetrails.room.Orientation;
+import com.raginggoose.roguetrails.room.Room;
 
 public class GameScreen implements Screen {
     public final Dungeon dun;
@@ -29,24 +30,24 @@ public class GameScreen implements Screen {
     private final ShapeRenderer shape;
     private final OrthographicCamera cam;
 
-    public GameScreen(RogueTrails game, AssetLoader assetLoader) {
     /**
      * Create a new game screen to display and play the game
      *
      * @param game the parent game class
      */
     public GameScreen(RogueTrails game) {
+
         this.game = game;
         this.batch = game.getBatch();
         assetManager = game.getAssetManager().manager;
-        this.assetLoader = assetLoader;
+        assetLoader = game.getAssetManager();
         shape = new ShapeRenderer();
 
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        ecsEngine = new ECSEngine(shape, cam, assetManager);
-        ecsEngine.createPlayer(10, 10, 32, 32, 0, Color.BLUE, assetManager);
+        ecsEngine = new ECSEngine(shape, batch, cam, assetManager);
+        ecsEngine.createPlayer(10, 10, 32, 32, 0, assetManager);
 
         dun = makeDungeon();
 
@@ -110,6 +111,7 @@ public class GameScreen implements Screen {
 
         shape.end();
 
+        batch.setProjectionMatrix(cam.combined);
         //TODO add collision system to ecs
         ecsEngine.update(delta);
     }

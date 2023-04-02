@@ -39,6 +39,10 @@ public class RogueTrails extends Game {
         // Use an enum map to cache screens by their screen types
         screenCache = new EnumMap<>(ScreenType.class);
 
+        // TODO make loading screen
+        assetManager.queueAssets();
+        assetManager.manager.finishLoading();
+
         // Set the first screen to type GAME
         setScreen(ScreenType.GAME);
     }

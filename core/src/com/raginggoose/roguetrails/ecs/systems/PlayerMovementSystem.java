@@ -30,7 +30,7 @@ public class PlayerMovementSystem extends IteratingSystem {
     public PlayerMovementSystem(Dungeon dun) {
         super(Family.all(PlayerComponent.class).get());
         this.dun = dun;
-        stateMapper = Mapper.stateMapper;
+        stateMapper = Mapper.STATE_MAPPER;
     }
 
     private Direction checkCollision(float x, float y, float w, float h, Room room) {
