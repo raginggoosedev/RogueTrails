@@ -8,9 +8,9 @@ public class AssetLoader {
     public final AssetManager manager = new AssetManager();
 
     // Textures
-    public static final String PLAYER_MOVE = "playerSprites/playerMove.png";
+    //public static final String PLAYER_MOVE = "playerSprites/playerMove.png";
 
     public void queueAssets() {
-        manager.load(PLAYER_MOVE, Texture.class);
+        //manager.load(PLAYER_MOVE, Texture.class);
     }
 }

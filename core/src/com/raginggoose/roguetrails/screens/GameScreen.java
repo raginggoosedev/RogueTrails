@@ -8,7 +8,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.raginggoose.roguetrails.ecs.Mapper;
+import com.raginggoose.roguetrails.hud.HUD;
+import com.raginggoose.roguetrails.inventory.Inventory;
 import com.raginggoose.roguetrails.loader.AssetLoader;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
@@ -29,6 +34,10 @@ public class GameScreen implements Screen {
     private final AssetLoader assetLoader;
     private final ShapeRenderer shape;
     private final OrthographicCamera cam;
+    private final HUD hud;
+    private final Skin skin;
+    private final Stage stage;
+    private final Inventory inventory;
 
     /**
      * Create a new game screen to display and play the game
@@ -46,7 +55,7 @@ public class GameScreen implements Screen {
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        ecsEngine = new ECSEngine(shape, batch, cam, assetManager);
+        ecsEngine = new ECSEngine(shape, batch, cam);
         ecsEngine.createPlayer(10, 10, 32, 32, 0, assetManager);
 
         dun = makeDungeon();
@@ -54,6 +63,14 @@ public class GameScreen implements Screen {
         spawnItems(dun.getStart(), 200, 100);
 
         ecsEngine.addSystem(new PlayerMovementSystem(dun));
+
+        skin = new Skin(Gdx.files.internal("skin.json"));
+
+        inventory = Mapper.PLAYER_MAPPER.get(ecsEngine.getPlayer()).inventory;
+        hud = new HUD(inventory, skin);
+
+        stage = new Stage();
+        hud.setStage(stage);
     }
 
     @Override
@@ -114,6 +131,10 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(cam.combined);
         //TODO add collision system to ecs
         ecsEngine.update(delta);
+
+        hud.updateInventory(inventory);
+        stage.draw();
+        stage.act(delta);
     }
 
     @Override
@@ -139,5 +160,6 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         shape.dispose();
+        stage.dispose();
     }
 }

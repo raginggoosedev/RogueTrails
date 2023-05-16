@@ -4,9 +4,11 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.raginggoose.roguetrails.ecs.Mapper;
-import com.raginggoose.roguetrails.ecs.components.*;
+import com.raginggoose.roguetrails.ecs.components.AnimationComponent;
+import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
+import com.raginggoose.roguetrails.ecs.components.RenderComponent;
+import com.raginggoose.roguetrails.ecs.components.StateComponent;
 
 public class AnimationSystem extends IteratingSystem {
 
@@ -23,9 +25,10 @@ public class AnimationSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        final AnimationComponent animationComponent = animationMapper.get(entity);
-        final StateComponent stateComponent = stateMapper.get(entity);
+        AnimationComponent animationComponent = animationMapper.get(entity);
+        StateComponent stateComponent = stateMapper.get(entity);
         RenderComponent renderComponent = renderMapper.get(entity);
-        //textureComponent.region = animationComponent.animations.get(stateComponent.getState()).getKeyFrame(stateComponent.time, stateComponent.isLooping);
+        renderComponent.region = animationComponent.animations.get(stateComponent.getState()).getKeyFrame(stateComponent.time, stateComponent.isLooping);
+        stateComponent.time += deltaTime;
     }
 }

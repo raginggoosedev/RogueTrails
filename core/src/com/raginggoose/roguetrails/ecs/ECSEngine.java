@@ -252,4 +252,8 @@ public class ECSEngine extends PooledEngine {
         sBuild.append("----------------------------------\n");
         Gdx.app.debug(TAG, sBuild.toString());
     }
+
+    public Entity getPlayer() {
+        return player;
+    }
 }
