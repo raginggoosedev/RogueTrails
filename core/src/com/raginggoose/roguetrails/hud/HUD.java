@@ -6,22 +6,22 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.inventory.Inventory;
 
 public class HUD {
-    private final HorizontalGroup group;
+    private final HorizontalGroup healthGroup;
+    private final HorizontalGroup inventoryGroup;
     private final Skin skin;
 
-    public HUD(Inventory inventory, Skin skin) {
+    public HUD(Inventory inventory, Skin skin, float hp) {
         this.skin = skin;
-        group = new HorizontalGroup();
-        group.space(10f);
+        inventoryGroup = new HorizontalGroup();
+        inventoryGroup.space(10f);
 
         Label title = new Label("Inventory", skin);
-        group.addActor(title);
-        group.space(10f);
+        inventoryGroup.addActor(title);
+        inventoryGroup.space(10f);
 
         for (int i = 0; i < 10; i++) {
             Entity itemEntity = inventory.getInventory().get(i);
@@ -29,28 +29,55 @@ public class HUD {
                 String itemName = Mapper.ITEM_MAPPER.get(itemEntity).toString();
                 Label itemLabel = new Label("Item " + (i + 1) + ": " + itemName, skin);
                 itemLabel.setColor(Color.WHITE);
-                group.addActor(itemLabel);
+                inventoryGroup.addActor(itemLabel);
             } else {
-                group.addActor(new Label("", skin));
+                inventoryGroup.addActor(new Label("", skin));
             }
+        }
+
+        healthGroup = new HorizontalGroup();
+        healthGroup.space(10f);
+        Label health = new Label("Health", skin);
+        healthGroup.addActor(health);
+
+        for (int i = 0; i < hp; i++) {
+            Label hpLabel = new Label("<3", skin);
+            hpLabel.setColor(Color.RED);
+            healthGroup.addActor(hpLabel);
         }
     }
 
     public void setStage(Stage s) {
-        s.addActor(group);
-        group.setPosition(10f, 10f);
+        s.addActor(inventoryGroup);
+        inventoryGroup.setPosition(10f, 10f);
+
+        s.addActor(healthGroup);
+        healthGroup.setPosition(10f, s.getHeight() - healthGroup.getHeight() - 10f);
     }
 
     public void updateInventory(Inventory inventory) {
         for (int i = 0; i < 10; i++) {
             Entity itemEntity = inventory.getInventory().get(i);
-            Label itemLabel = (Label) group.getChildren().get(i + 1); // first child is title label
+            Label itemLabel = (Label) inventoryGroup.getChildren().get(i + 1); // first child is title label
             if (itemEntity != null) {
                 String itemName = Mapper.ITEM_MAPPER.get(itemEntity).toString();
                 itemLabel.setText("Item " + (i + 1) + ": " + itemName);
             } else {
                 itemLabel.setText("");
             }
+        }
+    }
+
+    public void updateHealth(float hp) {
+        healthGroup.clearChildren();
+
+        Label health = new Label("Health", skin);
+        healthGroup.addActor(health);
+
+        for (int i = 0; i < hp; i++) {
+            Label hpLabel = new Label("<3", skin);
+            hpLabel.setColor(Color.RED);
+            healthGroup.addActor(hpLabel);
         }
     }
 }

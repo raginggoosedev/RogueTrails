@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.raginggoose.roguetrails.ecs.Mapper;
+import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
 import com.raginggoose.roguetrails.hud.HUD;
 import com.raginggoose.roguetrails.inventory.Inventory;
 import com.raginggoose.roguetrails.loader.AssetLoader;
@@ -66,8 +67,9 @@ public class GameScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("skin.json"));
 
-        inventory = Mapper.PLAYER_MAPPER.get(ecsEngine.getPlayer()).inventory;
-        hud = new HUD(inventory, skin);
+        PlayerComponent playerComponent = Mapper.PLAYER_MAPPER.get(ecsEngine.getPlayer());
+        inventory = playerComponent.inventory;
+        hud = new HUD(inventory, skin, playerComponent.health);
 
         stage = new Stage();
         hud.setStage(stage);

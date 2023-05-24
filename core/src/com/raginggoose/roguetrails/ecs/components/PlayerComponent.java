@@ -10,10 +10,12 @@ import com.raginggoose.roguetrails.inventory.Inventory;
 public class PlayerComponent implements Component, Pool.Poolable {
     public float speed = 0.0f;
     public Inventory inventory = null;
+    public float health = 0.0f;
 
     @Override
     public void reset() {
         speed = 0.0f;
+        health = 0.0f;
         inventory = null;
     }
 }

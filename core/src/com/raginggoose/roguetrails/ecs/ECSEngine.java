@@ -57,6 +57,7 @@ public class ECSEngine extends PooledEngine {
         // Player Component
         PlayerComponent playerComponent = this.createComponent(PlayerComponent.class);
         playerComponent.speed = 2.0f;
+        playerComponent.health = 3.0f;
         playerComponent.inventory = new Inventory();
         player.add(playerComponent);
         sBuild.append("Player Speed: ").append(playerComponent.speed).append("\n");
