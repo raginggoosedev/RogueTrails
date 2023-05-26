@@ -113,7 +113,7 @@ public class Cell extends Room {
             int enemyX = MathUtils.random(x, x + w - 32);
             int enemyY = MathUtils.random(y, y + h - 32);
 
-            ecsEngine.createEnemy(enemyX, enemyY, 32, 32, 1, Color.RED);
+            ecsEngine.createEnemy(enemyX, enemyY, 32, 32, 1);
         }
     }
 
