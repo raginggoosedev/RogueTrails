@@ -28,9 +28,9 @@ import com.raginggoose.roguetrails.room.Room;
 public class GameScreen implements Screen {
     public final Dungeon dun;
     private final RogueTrails game;
+    private final AssetManager assetManager;
     private final SpriteBatch batch;
     private final ECSEngine ecsEngine;
-    private final AssetManager assetManager;
     private final AssetLoader assetLoader;
     private final ShapeRenderer shape;
     private final OrthographicCamera cam;
@@ -55,8 +55,8 @@ public class GameScreen implements Screen {
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        ecsEngine = new ECSEngine(shape, batch, cam);
-        ecsEngine.createPlayer(10, 10, 32, 32, 0, assetManager);
+        ecsEngine = new ECSEngine(shape, batch, cam, assetManager);
+        ecsEngine.createPlayer(10, 10, 32, 32, 0);
 
         dun = makeDungeon();
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -20,22 +21,23 @@ import com.raginggoose.roguetrails.inventory.Inventory;
  */
 public class ECSEngine extends PooledEngine {
     public final static String TAG = ECSEngine.class.getSimpleName();
+    private final AssetManager assetManager;
     public static final Color ENEMY_DEBUG_COLOUR = Color.RED;
     public static final Color PLAYER_DEBUG_COLOUR = Color.BLUE;
     public static final Color ITEM_DEBUG_COLOUR = Color.GREEN;
-    private final Entity player;
+    private Entity player;
 
-    public ECSEngine(ShapeRenderer s, SpriteBatch batch, OrthographicCamera cam) {
+    public ECSEngine(ShapeRenderer s, SpriteBatch batch, OrthographicCamera cam, AssetManager assetManager) {
         if (RogueTrails.DEBUG)
             this.addSystem(new DebugRenderingSystem(s));
-
+        this.assetManager = assetManager;
         this.addSystem(new PlayerCameraSystem(cam));
 
         this.addSystem(new EnemyMovementSystem());
 
         this.addSystem(new RenderingSystem(batch));
+        this.addSystem(new AnimationSystem());
 
-        player = this.createEntity();
         this.addSystem(new InteractionSystem(player));
     }
 
@@ -48,7 +50,8 @@ public class ECSEngine extends PooledEngine {
      * @param h         the player's height
      * @param drawOrder the layer that the player is drawn on (the order)
      */
-    public void createPlayer(int x, int y, int w, int h, int drawOrder, AssetManager assetManager) {
+    public void createPlayer(int x, int y, int w, int h, int drawOrder) {
+        player = this.createEntity();
         StringBuilder sBuild = new StringBuilder();
         sBuild.append("----------------------\n");
         sBuild.append("New PLAYER entity\n");
@@ -71,11 +74,7 @@ public class ECSEngine extends PooledEngine {
         sBuild.append("Player Position: ").append(transformComponent.position.toString()).append("\n");
         sBuild.append("Player Width & Height: ").append(transformComponent.width).append(", ").append(transformComponent.height).append("\n");
 
-        // Render Component
-        RenderComponent renderComponent = this.createComponent(RenderComponent.class);
-        renderComponent.shouldRender = true;
-        renderComponent.region = new TextureRegion(new Texture("badlogic.jpg"));
-        player.add(renderComponent);
+
 
         // State Component
         StateComponent stateComponent = this.createComponent(StateComponent.class);
@@ -83,8 +82,9 @@ public class ECSEngine extends PooledEngine {
         stateComponent.isLooping = true;
         player.add(stateComponent);
 
-        // TODO animation
-    /*
+    //TODO Animation stuff is all this, somehow it will need to be fixed, errors stem from gamescreen
+        final AnimationComponent animationComponent = this.createComponent(AnimationComponent.class);
+
         Texture playerMove = new Texture(Gdx.files.internal("playerSprites/playerMove.png"));
         final int FRAME_COLS = 10, FRAME_ROWS = 1;
         float frameSpeed = 0.05f;
@@ -99,12 +99,14 @@ public class ECSEngine extends PooledEngine {
             }
         }
 
-        Animation<TextureRegion> movementAnimation = new Animation<>(frameSpeed, movementFrames);
-*/
-        // Animation Component
-        AnimationComponent animationComponent = this.createComponent(AnimationComponent.class);
+        Animation<TextureRegion> move = new Animation<>(frameSpeed, movementFrames);
+        animationComponent.animations.put(StateComponent.STATE_RIGHT, move);
 
-        //animationComponent.animations.put(StateComponent.STATE_RIGHT, movementAnimation);
+        // Render Component
+        RenderComponent renderComponent = this.createComponent(RenderComponent.class);
+        renderComponent.shouldRender = true;
+        renderComponent.region = new TextureRegion(movementFrames[0]);
+        player.add(renderComponent);
 
         // Debug Component
         if (RogueTrails.DEBUG) {
