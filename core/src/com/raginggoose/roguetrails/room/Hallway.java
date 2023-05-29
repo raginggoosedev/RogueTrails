@@ -21,6 +21,7 @@ public class Hallway extends Room {
     private Room EAST = null;
     private Room SOUTH = null;
     private Room WEST = null;
+    private Room PARENT = null;
 
     //constructor without dimensions
     public Hallway (Orientation orientation) {
@@ -100,8 +101,14 @@ public class Hallway extends Room {
     }
 
     @Override
+    public Room getParent() {
+        return PARENT;
+    }
+
+    @Override
     public void setNorth(Room room) {
         if (ORIENTATION == Orientation.VERTICAL)
+            if(PARENT == null) PARENT = room;
             room.setX(this.x + this.w/2 - room.getWidth()/2);
             room.setY(this.y + this.h);
             NORTH = room;
@@ -110,6 +117,7 @@ public class Hallway extends Room {
     @Override
     public void setEast(Room room) {
         if (ORIENTATION == Orientation.HORIZONTAL)
+            if (PARENT == null) PARENT = room;
             room.setX(this.x + this.w);
             room.setY(this.y + this.h/2 - room.getWidth()/2);
             EAST = room;
@@ -118,6 +126,7 @@ public class Hallway extends Room {
     @Override
     public void setSouth(Room room) {
         if (ORIENTATION == Orientation.VERTICAL)
+            if (PARENT == null) PARENT = room;
             room.setX(this.x + this.w/2 - room.getWidth()/2);
             room.setY(this.y-room.getHeight());
             SOUTH = room;
@@ -126,8 +135,9 @@ public class Hallway extends Room {
     @Override
     public void setWest(Room room) {
         if (ORIENTATION == Orientation.HORIZONTAL)
+            if (PARENT == null) PARENT = room;
             room.setX(this.x-room.getWidth());
-            room.setY(this.y + this.h/2 - room.getWidth()/2);
+            room.setY(this.y + this.h/2 - room.getHeight()/2);
             WEST = room;
     }
 
@@ -172,5 +182,10 @@ public class Hallway extends Room {
 
     public void moveY(int dy) {
         y+=dy;
+    }
+
+    @Override
+    public boolean isParentOf(Room room) {
+        return (this == room.getParent());
     }
 }
