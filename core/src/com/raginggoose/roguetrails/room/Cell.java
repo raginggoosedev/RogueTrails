@@ -63,10 +63,13 @@ public class Cell extends Room {
 //        room.moveX(this.w/2 - room.getWidth()/2);
 //        room.moveY(room.getHeight());
         if (PARENT == null) PARENT = room;
+        if (NORTH == room) return;
         room.setX(this.x + this.w / 2 - room.getWidth() / 2);
         room.setY(this.y + this.h);
         NORTH = room;
         addEnemies();
+
+        room.setSouth(this);
     }
 
     @Override
@@ -76,13 +79,15 @@ public class Cell extends Room {
 
     @Override
     public void setEast(Room room) {
-//        room.moveX(this.w);
-//        room.moveY(this.h/2 - room.getHeight()/2);
         if (PARENT == null) PARENT = room;
+        if (EAST == room) return;
+
         room.setX(this.x + this.w);
         room.setY(this.y + this.h / 2 - room.getHeight() / 2);
         EAST = room;
         addEnemies();
+
+        room.setWest(this);
     }
 
     @Override
@@ -95,10 +100,14 @@ public class Cell extends Room {
 //        room.moveX(this.w/2-room.getWidth()/2);
 //        room.moveY(this.h);
         if (PARENT == null) PARENT = room;
+        if (SOUTH == room) return;
+
         room.setX(this.x + this.w / 2 - room.getWidth() / 2);
         room.setY(this.y - room.getHeight());
         SOUTH = room;
         addEnemies();
+
+        room.setNorth(this);
     }
 
     @Override
@@ -112,10 +121,14 @@ public class Cell extends Room {
 //        room.moveX(-room.getWidth());
 //        room.moveY(-this.w/2 + room.getHeight()/2);
         if (PARENT == null) PARENT = room;
+        if (WEST == room) return;
+
         room.setX(this.x - room.getWidth());
         room.setY(this.y + this.h / 2 - room.getHeight() / 2);
         WEST = room;
         addEnemies();
+
+        room.setEast(this);
     }
 
     @Override
@@ -178,6 +191,11 @@ public class Cell extends Room {
 
     public CollisionBox getBox() {
         return box;
+    }
+
+    @Override
+    public void setParent(Room room) {
+        PARENT = room;
     }
 
     @Override

@@ -2,6 +2,9 @@ package com.raginggoose.roguetrails.dungeon;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.raginggoose.roguetrails.collisions.CollisionWorld;
+import com.raginggoose.roguetrails.ecs.ECSEngine;
+import com.raginggoose.roguetrails.room.Cell;
 import com.raginggoose.roguetrails.room.Room;
 
 import java.util.ArrayList;
@@ -22,6 +25,8 @@ public class Dungeon implements Cloneable {
         END = null; //TODO: make this not null
         x = 0;
         y = 0;
+
+        start.setParent(new Cell(0,0,null, new CollisionWorld())); //this is important no touch
     }
 
     //Constructor with position
@@ -30,6 +35,8 @@ public class Dungeon implements Cloneable {
         END = null; //TODO: make this not null
         this.x = x;
         this.y = y;
+
+        start.setParent(new Cell(0,0,null, new CollisionWorld())); //this is important no touch
     }
 
     public Room getStart() {

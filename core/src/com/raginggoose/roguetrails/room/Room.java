@@ -38,4 +38,5 @@ public abstract class Room {
     public abstract boolean isParentOf(Room room);
 
     public abstract CollisionBox getBox();
+    public abstract void setParent(Room room);
 }
