@@ -96,9 +96,13 @@ public class Hallway extends Room {
     public void setNorth(Room room) {
         if (ORIENTATION == Orientation.VERTICAL)
             if (PARENT == null) PARENT = room;
-        room.setX(this.x + this.w / 2 - room.getWidth() / 2);
-        room.setY(this.y + this.h);
-        NORTH = room;
+            if (NORTH == room) return;
+
+            room.setX(this.x + this.w / 2 - room.getWidth() / 2);
+            room.setY(this.y + this.h);
+            NORTH = room;
+
+            room.setSouth(this);
     }
 
     @Override
@@ -110,9 +114,13 @@ public class Hallway extends Room {
     public void setEast(Room room) {
         if (ORIENTATION == Orientation.HORIZONTAL)
             if (PARENT == null) PARENT = room;
-        room.setX(this.x + this.w);
-        room.setY(this.y + this.h / 2 - room.getWidth() / 2);
-        EAST = room;
+            if (EAST == room) return;
+
+            room.setX(this.x + this.w);
+            room.setY(this.y + this.h / 2 - room.getWidth() / 2);
+            EAST = room;
+
+            room.setWest(this);
     }
 
     @Override
@@ -124,9 +132,13 @@ public class Hallway extends Room {
     public void setSouth(Room room) {
         if (ORIENTATION == Orientation.VERTICAL)
             if (PARENT == null) PARENT = room;
-        room.setX(this.x + this.w / 2 - room.getWidth() / 2);
-        room.setY(this.y - room.getHeight());
-        SOUTH = room;
+            if (SOUTH == room) return;
+
+            room.setX(this.x + this.w / 2 - room.getWidth() / 2);
+            room.setY(this.y - room.getHeight());
+            SOUTH = room;
+
+            room.setNorth(this);
     }
 
     @Override
@@ -138,9 +150,13 @@ public class Hallway extends Room {
     public void setWest(Room room) {
         if (ORIENTATION == Orientation.HORIZONTAL)
             if (PARENT == null) PARENT = room;
-        room.setX(this.x - room.getWidth());
-        room.setY(this.y + this.h / 2 - room.getHeight() / 2);
-        WEST = room;
+            if (WEST == room) return;
+
+            room.setX(this.x - room.getWidth());
+            room.setY(this.y + this.h / 2 - room.getHeight() / 2);
+            WEST = room;
+
+            room.setEast(this);
     }
 
     @Override
