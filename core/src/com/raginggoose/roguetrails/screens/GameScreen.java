@@ -61,8 +61,8 @@ public class GameScreen implements Screen {
         world = new CollisionWorld();
 
 
-        ecsEngine = new ECSEngine(shape, batch, cam, world);
-        ecsEngine.createPlayer(10, 10, 32, 32, 0, assetManager);
+        ecsEngine = new ECSEngine(shape, batch, cam, world, assetLoader);
+        ecsEngine.createPlayer(10, 10, 64, 64, 0);
 
 
         dun = makeDungeon();
@@ -129,7 +129,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0, 0, 0, 1);
+        ScreenUtils.clear(0.2f, 0.75f, 0.5f, 1);
         // Draw a small rectangle
         shape.setProjectionMatrix(cam.combined);
         shape.begin(ShapeRenderer.ShapeType.Line);
