@@ -7,25 +7,35 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.raginggoose.roguetrails.RogueTrails;
+import com.raginggoose.roguetrails.collisions.CollisionBox;
+import com.raginggoose.roguetrails.collisions.CollisionWorld;
 import com.raginggoose.roguetrails.ecs.components.*;
 import com.raginggoose.roguetrails.ecs.systems.*;
 import com.raginggoose.roguetrails.inventory.Inventory;
+import com.raginggoose.roguetrails.loader.AssetLoader;
 
 /**
  * Handles all the game's entities
  */
 public class ECSEngine extends PooledEngine {
     public final static String TAG = ECSEngine.class.getSimpleName();
+    private final CollisionWorld world;
     public static final Color ENEMY_DEBUG_COLOUR = Color.RED;
     public static final Color PLAYER_DEBUG_COLOUR = Color.BLUE;
     public static final Color ITEM_DEBUG_COLOUR = Color.GREEN;
     private final Entity player;
+    private final AssetLoader assetLoader;
 
-    public ECSEngine(ShapeRenderer s, SpriteBatch batch, OrthographicCamera cam) {
+    public ECSEngine(ShapeRenderer s, SpriteBatch batch, OrthographicCamera cam, CollisionWorld world, AssetLoader assetLoader) {
+        this.world = world;
+        this.assetLoader = assetLoader;
+
         if (RogueTrails.DEBUG)
             this.addSystem(new DebugRenderingSystem(s));
 
@@ -34,6 +44,10 @@ public class ECSEngine extends PooledEngine {
         this.addSystem(new EnemyMovementSystem());
 
         this.addSystem(new RenderingSystem(batch));
+
+        this.addSystem(new CollisionSystem());
+
+        this.addSystem(new AnimationSystem());
 
         player = this.createEntity();
         this.addSystem(new InteractionSystem(player));
@@ -48,7 +62,7 @@ public class ECSEngine extends PooledEngine {
      * @param h         the player's height
      * @param drawOrder the layer that the player is drawn on (the order)
      */
-    public void createPlayer(int x, int y, int w, int h, int drawOrder, AssetManager assetManager) {
+    public void createPlayer(int x, int y, int w, int h, int drawOrder) {
         StringBuilder sBuild = new StringBuilder();
         sBuild.append("----------------------\n");
         sBuild.append("New PLAYER entity\n");
@@ -57,6 +71,7 @@ public class ECSEngine extends PooledEngine {
         // Player Component
         PlayerComponent playerComponent = this.createComponent(PlayerComponent.class);
         playerComponent.speed = 2.0f;
+        playerComponent.health = 3.0f;
         playerComponent.inventory = new Inventory();
         player.add(playerComponent);
         sBuild.append("Player Speed: ").append(playerComponent.speed).append("\n");
@@ -64,6 +79,7 @@ public class ECSEngine extends PooledEngine {
         // Transform Component
         TransformComponent transformComponent = this.createComponent(TransformComponent.class);
         transformComponent.position.set(x, y, drawOrder);
+        transformComponent.prevPosition.set(transformComponent.position.x, transformComponent.position.y);
         transformComponent.scale.set(1, 1);
         transformComponent.width = w;
         transformComponent.height = h;
@@ -71,11 +87,7 @@ public class ECSEngine extends PooledEngine {
         sBuild.append("Player Position: ").append(transformComponent.position.toString()).append("\n");
         sBuild.append("Player Width & Height: ").append(transformComponent.width).append(", ").append(transformComponent.height).append("\n");
 
-        // Render Component
-        RenderComponent renderComponent = this.createComponent(RenderComponent.class);
-        renderComponent.shouldRender = true;
-        renderComponent.region = new TextureRegion(new Texture("badlogic.jpg"));
-        player.add(renderComponent);
+
 
         // State Component
         StateComponent stateComponent = this.createComponent(StateComponent.class);
@@ -83,28 +95,30 @@ public class ECSEngine extends PooledEngine {
         stateComponent.isLooping = true;
         player.add(stateComponent);
 
-        // TODO animation
-    /*
-        Texture playerMove = new Texture(Gdx.files.internal("playerSprites/playerMove.png"));
-        final int FRAME_COLS = 10, FRAME_ROWS = 1;
-        float frameSpeed = 0.05f;
-        TextureRegion[][] movement = TextureRegion.split(playerMove, playerMove.getHeight() / FRAME_COLS, playerMove.getWidth() / FRAME_ROWS);
-
-        TextureRegion[] movementFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
-
-        int indexMove = 0;
-        for (int i = 0; i < FRAME_ROWS; i++) {
-            for (int j = 0; j < FRAME_COLS; j++) {
-                movementFrames[indexMove++] = movement[i][j];
-            }
-        }
-
-        Animation<TextureRegion> movementAnimation = new Animation<>(frameSpeed, movementFrames);
-*/
         // Animation Component
         AnimationComponent animationComponent = this.createComponent(AnimationComponent.class);
 
-        //animationComponent.animations.put(StateComponent.STATE_RIGHT, movementAnimation);
+        TextureAtlas playerAtlas = assetLoader.manager.get(AssetLoader.PLAYER_ATLAS);
+        Animation<TextureRegion> upAnim = new Animation<>(0.1f, playerAtlas.findRegions("walk"));
+
+        animationComponent.animations.put(StateComponent.STATE_UP, upAnim);
+        animationComponent.animations.put(StateComponent.STATE_DOWN, upAnim);
+        animationComponent.animations.put(StateComponent.STATE_LEFT, upAnim);
+        animationComponent.animations.put(StateComponent.STATE_RIGHT, upAnim);
+
+        player.add(animationComponent);
+
+        // Render Component
+        RenderComponent renderComponent = this.createComponent(RenderComponent.class);
+        renderComponent.shouldRender = true;
+        renderComponent.region = playerAtlas.findRegion("walk", 1);
+        player.add(renderComponent);
+
+        // Collision Component
+        CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
+        collisionComponent.box = new CollisionBox(transformComponent.prevPosition, transformComponent.width, transformComponent.height, player);
+        world.addCollisionBox(collisionComponent.box);
+        player.add(collisionComponent);
 
         // Debug Component
         if (RogueTrails.DEBUG) {
@@ -128,7 +142,7 @@ public class ECSEngine extends PooledEngine {
      * @param h         the enemy's height
      * @param drawOrder the enemy's layer to be drawn on
      */
-    public void createEnemy(int x, int y, int w, int h, int drawOrder) {
+    public void createEnemy(int x, int y, int w, int h, int drawOrder, float damage) {
         Entity enemy = this.createEntity();
         StringBuilder sBuild = new StringBuilder();
         sBuild.append("----------------------\n");
@@ -138,6 +152,7 @@ public class ECSEngine extends PooledEngine {
         EnemyComponent enemyComponent = this.createComponent(EnemyComponent.class);
         enemyComponent.player = player;
         enemyComponent.speed = 1.0f;
+        enemyComponent.damage = damage;
         enemy.add(enemyComponent);
         sBuild.append("Enemy Speed: ").append(enemyComponent.speed).append("\n");
 
@@ -155,6 +170,12 @@ public class ECSEngine extends PooledEngine {
         RenderComponent renderComponent = this.createComponent(RenderComponent.class);
         renderComponent.shouldRender = true;
         enemy.add(renderComponent);
+
+        // Collision Component
+        CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
+        collisionComponent.box = new CollisionBox(transformComponent.prevPosition, transformComponent.width, transformComponent.height, enemy);
+        world.addCollisionBox(collisionComponent.box);
+        enemy.add(collisionComponent);
 
         // Debug Component
         if (RogueTrails.DEBUG) {

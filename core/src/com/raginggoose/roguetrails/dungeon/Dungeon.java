@@ -1,7 +1,9 @@
 package com.raginggoose.roguetrails.dungeon;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.raginggoose.roguetrails.room.Room;
+
 import java.util.ArrayList;
 
 public class Dungeon implements Cloneable {
@@ -42,12 +44,12 @@ public class Dungeon implements Cloneable {
         return x;
     }
 
-    public int getY() {
-        return y;
-    }
-
     public void setX(int x) {
         this.x = x;
+    }
+
+    public int getY() {
+        return y;
     }
 
     public void setY(int y) {
@@ -103,7 +105,9 @@ public class Dungeon implements Cloneable {
         putIntoArray(START, roomList);
 
         for (Room r : roomList) {
-            if (inRoom(x, y, r)) return r;
+            if (inRoom(x, y, r))  {
+                return r;
+            }
         }
 
         return null;
@@ -141,4 +145,14 @@ public class Dungeon implements Cloneable {
         return (playerX >= x1 && playerX <= x2 && playerY >= y1 && playerY <= y2);
     }
 
+    public void updateBoxes() {
+        ArrayList<Room> roomList = new ArrayList<>();
+        putIntoArray(START, roomList);
+
+        for (Room r : roomList) {
+            r.getBox().updatePosition(new Vector2(r.getX(), r.getY()));
+        }
+    }
 }
+
+

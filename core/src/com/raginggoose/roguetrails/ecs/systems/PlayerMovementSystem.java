@@ -21,7 +21,7 @@ import com.raginggoose.roguetrails.room.Room;
 public class PlayerMovementSystem extends IteratingSystem {
     private final Dungeon dun;
     private final ComponentMapper<StateComponent> stateMapper;
-    
+
     /**
      * Creates a new player movement system with the dungeon as a parameter
      *
@@ -75,17 +75,19 @@ public class PlayerMovementSystem extends IteratingSystem {
         float speed = playerComponent.speed;
         final StateComponent stateComponent = stateMapper.get(entity);
         Vector3 pos = transform.position;
+        transform.prevPosition.set(pos.x, pos.y);
 
+        dun.getCurrentRoom(transform.position.x, transform.position.y);
         Direction dir = checkCollision(pos.x, pos.y, transform.width, transform.height, dun.getCurrentRoom(pos.x, pos.y));
 
         // Determine which input was pressed, then add or subtract from the position vector accordingly
         if (Gdx.input.isKeyPressed(Input.Keys.W) && dir != Direction.UP) transform.position.add(0, speed, 0);
         else if (Gdx.input.isKeyPressed(Input.Keys.S) && dir != Direction.DOWN) transform.position.add(0, -speed, 0);
-        
+
         if (Gdx.input.isKeyPressed(Input.Keys.A) && dir != Direction.LEFT)
             transform.position.add(-speed, 0, 0);
         else if (Gdx.input.isKeyPressed(Input.Keys.D) && dir != Direction.RIGHT)
             transform.position.add(speed, 0, 0);
-            stateComponent.setState(StateComponent.STATE_RIGHT);
+        stateComponent.setState(StateComponent.STATE_RIGHT);
     }
 }

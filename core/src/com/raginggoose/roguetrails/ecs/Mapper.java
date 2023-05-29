@@ -14,4 +14,5 @@ public class Mapper {
     public static final ComponentMapper<RenderComponent> RENDER_MAPPER = ComponentMapper.getFor(RenderComponent.class);
     public static final ComponentMapper<AnimationComponent> ANIMATION_MAPPER = ComponentMapper.getFor(AnimationComponent.class);
     public static final ComponentMapper<StateComponent> STATE_MAPPER = ComponentMapper.getFor(StateComponent.class);
+    public static final ComponentMapper<CollisionComponent> COLLISION_MAPPER = ComponentMapper.getFor(CollisionComponent.class);
 }

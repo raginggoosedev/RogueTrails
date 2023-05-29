@@ -11,7 +11,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.raginggoose.roguetrails.collisions.CollisionWorld;
 import com.raginggoose.roguetrails.ecs.Mapper;
+import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
 import com.raginggoose.roguetrails.hud.HUD;
 import com.raginggoose.roguetrails.inventory.Inventory;
 import com.raginggoose.roguetrails.loader.AssetLoader;
@@ -26,7 +28,7 @@ import com.raginggoose.roguetrails.room.Orientation;
 import com.raginggoose.roguetrails.room.Room;
 
 public class GameScreen implements Screen {
-    public final Dungeon dun;
+    public Dungeon dun;
     private final RogueTrails game;
     private final SpriteBatch batch;
     private final ECSEngine ecsEngine;
@@ -38,7 +40,8 @@ public class GameScreen implements Screen {
     private final Skin skin;
     private final Stage stage;
     private final Inventory inventory;
-
+    private final CollisionWorld world;
+    private final PlayerComponent playerComponent;
     /**
      * Create a new game screen to display and play the game
      *
@@ -55,10 +58,15 @@ public class GameScreen implements Screen {
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        ecsEngine = new ECSEngine(shape, batch, cam);
-        ecsEngine.createPlayer(10, 10, 32, 32, 0, assetManager);
+        world = new CollisionWorld();
+
+
+        ecsEngine = new ECSEngine(shape, batch, cam, world, assetLoader);
+        ecsEngine.createPlayer(10, 10, 64, 64, 0);
+
 
         dun = makeDungeon();
+        dun.updateBoxes();
 
         spawnItems(dun.getStart(), 200, 100);
 
@@ -66,8 +74,9 @@ public class GameScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("skin.json"));
 
-        inventory = Mapper.PLAYER_MAPPER.get(ecsEngine.getPlayer()).inventory;
-        hud = new HUD(inventory, skin);
+        playerComponent = Mapper.PLAYER_MAPPER.get(ecsEngine.getPlayer());
+        inventory = playerComponent.inventory;
+        hud = new HUD(inventory, skin, playerComponent.health);
 
         stage = new Stage();
         hud.setStage(stage);
@@ -79,95 +88,31 @@ public class GameScreen implements Screen {
     }
 
     public Dungeon makeDungeon() {
-        Cell start = new Cell(300, 300, ecsEngine);
-
-        Hallway hall1 = new Hallway(300, 80, Orientation.HORIZONTAL);
-
-        Cell cellA = new Cell(300, 300, ecsEngine);
-
-        Hallway hall2 = new Hallway(80, 300, Orientation.VERTICAL);
-
-        Hallway hall3 = new Hallway(300, 80, Orientation.HORIZONTAL);
-
-        Cell cellB = new Cell(300, 300, ecsEngine);
-
-        Cell cellD = new Cell(100, 100, ecsEngine);
-
-        Hallway hall4 = new Hallway(300, 80, Orientation.HORIZONTAL);
-
-        Cell cellC = new Cell(1000, 1000, ecsEngine);
-
-        Cell cellE = new Cell(80, 80, ecsEngine);
+        Cell start = new Cell(300, 300, ecsEngine, world);
+        Hallway hall1 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
+        Cell cellA = new Cell(300, 300, ecsEngine, world);
+        Hallway hall2 = new Hallway(80, 300, Orientation.VERTICAL, world);
+        Hallway hall3 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
+        Cell cellB = new Cell(300, 300, ecsEngine, world);
+        Cell cellD = new Cell(100, 100, ecsEngine, world);
+        Hallway hall4 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
+        Cell cellC = new Cell(1000, 1500, ecsEngine, world);
+        Cell cellE = new Cell(80, 80, ecsEngine, world);
 
         Dungeon dungeon = new Dungeon(start, null);
 
-
-        start.setNorth(new Cell(0,0,ecsEngine));
         start.setEast(hall1);
-        hall1.setWest(start);
         hall1.setEast(cellA);
-        cellA.setWest(hall1);
         cellA.setSouth(hall2);
-        hall2.setNorth(cellA);
         hall2.setSouth(cellE);
-        cellE.setNorth(hall2);
         cellE.setWest(hall3);
-        cellE.setEast(hall4);
-        hall3.setEast(cellE);
-        hall4.setWest(cellE);
-
-        hall4.setEast(cellC);
-        cellC.setWest(hall4);
-
         hall3.setWest(cellB);
-        cellB.setEast(hall3);
-
         cellB.setSouth(cellD);
-        cellD.setNorth(cellB);
-        //cellC.setWest(hall4);
+        cellE.setEast(hall4);
+        hall4.setEast(cellC);
 
 
-        //start.setNorth(new Cell(0,0,ecsEngine));
-        //start.setEast(hall1);
-//        hall1.setEast(cellA);
-        //cellA.setSouth(hall2);
-        //hall2.setSouth(cellE);
-//        cellE.setWest(hall3);
-//        hall3.setWest(cellB);
-//        cellB.setSouth(cellD);
-//        cellE.setEast(hall4);
-//        hall4.setEast(cellC);
-
-
-//        start.setNorth(new Cell(0,0,ecsEngine)); //parent init bug
-//        start.setEast(hall1);
-//
-//        hall1.setWest(start); //parent
-//        hall1.setEast(cellA);
-//
-//        cellA.setWest(hall1); //parent
-//        cellA.setSouth(hall2);
-//
-//        hall2.setNorth(cellA); //parent
-//        hall2.setSouth(cellE);
-//
-//        cellE.setNorth(hall2); //parent
-//        cellE.setWest(hall3);
-//
-//        hall3.setEast(cellE); //parent
-//        hall3.setWest(cellB);
-//
-//        cellB.setEast(hall3); //parent
-//        cellB.setSouth(cellD);
-//
-//        cellD.setNorth(cellB); //parent
-//
-//        cellE.setEast(hall4);
-//
-//        hall4.setWest(cellE); //parent
-//        hall4.setEast(cellC);
-//
-//        cellC.setWest(hall4);
+        world.setDungeon(dungeon);
         return dungeon;
 
     }
@@ -184,7 +129,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0, 0, 0, 1);
+        ScreenUtils.clear(0.2f, 0.75f, 0.5f, 1);
         // Draw a small rectangle
         shape.setProjectionMatrix(cam.combined);
         shape.begin(ShapeRenderer.ShapeType.Line);
@@ -197,8 +142,10 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(cam.combined);
         //TODO add collision system to ecs
         ecsEngine.update(delta);
+        world.update();
 
         hud.updateInventory(inventory);
+        hud.updateHealth(playerComponent.health);
         stage.draw();
         stage.act(delta);
     }

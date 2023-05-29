@@ -49,7 +49,7 @@ public class RenderingSystem extends SortedIteratingSystem {
 
             TransformComponent transformComponent = Mapper.TRANSFORM_MAPPER.get(e);
 
-            batch.draw(renderComponent.region.getTexture(), transformComponent.position.x, transformComponent.position.y, transformComponent.width, transformComponent.height);
+            batch.draw(renderComponent.region, transformComponent.position.x, transformComponent.position.y, transformComponent.width, transformComponent.height);
         }
 
         batch.end();
