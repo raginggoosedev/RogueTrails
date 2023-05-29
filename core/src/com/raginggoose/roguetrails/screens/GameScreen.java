@@ -96,20 +96,45 @@ public class GameScreen implements Screen {
         Cell cellB = new Cell(300, 300, ecsEngine, world);
         Cell cellD = new Cell(100, 100, ecsEngine, world);
         Hallway hall4 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
-        Cell cellC = new Cell(1000, 1500, ecsEngine, world);
+        Cell cellC = new Cell(1000, 1000, ecsEngine, world);
         Cell cellE = new Cell(80, 80, ecsEngine, world);
 
         Dungeon dungeon = new Dungeon(start, null);
 
+        start.setNorth(new Cell(0,0,ecsEngine,world));
         start.setEast(hall1);
+
+        hall1.setWest(start);
         hall1.setEast(cellA);
+
+        cellA.setWest(hall1);
         cellA.setSouth(hall2);
+
+        hall2.setNorth(cellA);
         hall2.setSouth(cellE);
-        cellE.setWest(hall3);
-        hall3.setWest(cellB);
+
+        cellE.setNorth(hall2);
+        cellE.setEast(hall3); hall3.setWest(cellE);
+        cellE.setWest(hall4); hall4.setEast(cellE);
+
+        hall3.setEast(cellC);
+        cellC.setWest(hall3);
+
+        hall4.setWest(cellB);
+
+        cellB.setEast(hall4);
         cellB.setSouth(cellD);
-        cellE.setEast(hall4);
-        hall4.setEast(cellC);
+
+        cellD.setNorth(cellB);
+//        start.setEast(hall1);
+//        hall1.setEast(cellA);
+//        cellA.setSouth(hall2);
+//        hall2.setSouth(cellE);
+//        cellE.setWest(hall3);
+//        hall3.setWest(cellB);
+//        cellB.setSouth(cellD);
+//        cellE.setEast(hall4);
+//        hall4.setEast(cellC);
 
 
         world.setDungeon(dungeon);
