@@ -192,6 +192,11 @@ public class Hallway extends Room {
     }
 
     @Override
+    public void setParent(Room room) {
+        PARENT = room;
+    }
+
+    @Override
     public Room getParent() {
         return PARENT;
     }

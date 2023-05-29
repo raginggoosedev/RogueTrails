@@ -76,9 +76,9 @@ public class Cell extends Room {
 
     @Override
     public void setEast(Room room) {
-//        room.moveX(this.w);
-//        room.moveY(this.h/2 - room.getHeight()/2);
         if (PARENT == null) PARENT = room;
+
+
         room.setX(this.x + this.w);
         room.setY(this.y + this.h / 2 - room.getHeight() / 2);
         EAST = room;
@@ -178,6 +178,11 @@ public class Cell extends Room {
 
     public CollisionBox getBox() {
         return box;
+    }
+
+    @Override
+    public void setParent(Room room) {
+        PARENT = room;
     }
 
     @Override

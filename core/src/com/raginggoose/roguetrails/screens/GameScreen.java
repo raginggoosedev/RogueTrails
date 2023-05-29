@@ -101,7 +101,6 @@ public class GameScreen implements Screen {
 
         Dungeon dungeon = new Dungeon(start, null);
 
-        start.setNorth(new Cell(0,0,ecsEngine,world));
         start.setEast(hall1);
 
         hall1.setWest(start);
