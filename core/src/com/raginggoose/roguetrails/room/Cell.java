@@ -21,6 +21,7 @@ public class Cell extends Room {
     private Room EAST = null;
     private Room SOUTH = null;
     private Room WEST = null;
+    private Room PARENT = null;
 
     //Constructor if no parameters given
     /* public Cell() {
@@ -55,6 +56,7 @@ public class Cell extends Room {
     public void setNorth(Room room) {
 //        room.moveX(this.w/2 - room.getWidth()/2);
 //        room.moveY(room.getHeight());
+        if (PARENT == null) PARENT = room;
         room.setX(this.x + this.w / 2 - room.getWidth() / 2);
         room.setY(this.y + this.h);
         NORTH = room;
@@ -70,6 +72,7 @@ public class Cell extends Room {
     public void setEast(Room room) {
 //        room.moveX(this.w);
 //        room.moveY(this.h/2 - room.getHeight()/2);
+        if (PARENT == null) PARENT = room;
         room.setX(this.x + this.w);
         room.setY(this.y + this.h / 2 - room.getHeight() / 2);
         EAST = room;
@@ -85,6 +88,7 @@ public class Cell extends Room {
     public void setSouth(Room room) {
 //        room.moveX(this.w/2-room.getWidth()/2);
 //        room.moveY(this.h);
+        if (PARENT == null) PARENT = room;
         room.setX(this.x + this.w / 2 - room.getWidth() / 2);
         room.setY(this.y - room.getHeight());
         SOUTH = room;
@@ -96,14 +100,21 @@ public class Cell extends Room {
         return WEST;
     }
 
+
     @Override
     public void setWest(Room room) {
 //        room.moveX(-room.getWidth());
 //        room.moveY(-this.w/2 + room.getHeight()/2);
+        if (PARENT == null) PARENT = room;
         room.setX(this.x - room.getWidth());
         room.setY(this.y + this.h / 2 - room.getHeight() / 2);
         WEST = room;
         addEnemies();
+    }
+
+    @Override
+    public Room getParent() {
+        return PARENT;
     }
 
     public void addEnemies() {
@@ -153,6 +164,11 @@ public class Cell extends Room {
 
     public void moveY(int dy) {
         y += dy;
+    }
+
+    @Override
+    public boolean isParentOf(Room room) {
+        return this == room.getParent();
     }
 
     public String getName() {

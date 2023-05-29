@@ -80,28 +80,94 @@ public class GameScreen implements Screen {
 
     public Dungeon makeDungeon() {
         Cell start = new Cell(300, 300, ecsEngine);
+
         Hallway hall1 = new Hallway(300, 80, Orientation.HORIZONTAL);
+
         Cell cellA = new Cell(300, 300, ecsEngine);
+
         Hallway hall2 = new Hallway(80, 300, Orientation.VERTICAL);
+
         Hallway hall3 = new Hallway(300, 80, Orientation.HORIZONTAL);
+
         Cell cellB = new Cell(300, 300, ecsEngine);
+
         Cell cellD = new Cell(100, 100, ecsEngine);
+
         Hallway hall4 = new Hallway(300, 80, Orientation.HORIZONTAL);
-        Cell cellC = new Cell(1000, 1500, ecsEngine);
+
+        Cell cellC = new Cell(1000, 1000, ecsEngine);
+
         Cell cellE = new Cell(80, 80, ecsEngine);
 
         Dungeon dungeon = new Dungeon(start, null);
 
-        start.setEast(hall1);
-        hall1.setEast(cellA);
-        cellA.setSouth(hall2);
-        hall2.setSouth(cellE);
-        cellE.setWest(hall3);
-        hall3.setWest(cellB);
-        cellB.setSouth(cellD);
-        cellE.setEast(hall4);
-        hall4.setEast(cellC);
 
+        start.setNorth(new Cell(0,0,ecsEngine));
+        start.setEast(hall1);
+        hall1.setWest(start);
+        hall1.setEast(cellA);
+        cellA.setWest(hall1);
+        cellA.setSouth(hall2);
+        hall2.setNorth(cellA);
+        hall2.setSouth(cellE);
+        cellE.setNorth(hall2);
+        cellE.setWest(hall3);
+        cellE.setEast(hall4);
+        hall3.setEast(cellE);
+        hall4.setWest(cellE);
+
+        hall4.setEast(cellC);
+        cellC.setWest(hall4);
+
+        hall3.setWest(cellB);
+        cellB.setEast(hall3);
+
+        cellB.setSouth(cellD);
+        cellD.setNorth(cellB);
+        //cellC.setWest(hall4);
+
+
+        //start.setNorth(new Cell(0,0,ecsEngine));
+        //start.setEast(hall1);
+//        hall1.setEast(cellA);
+        //cellA.setSouth(hall2);
+        //hall2.setSouth(cellE);
+//        cellE.setWest(hall3);
+//        hall3.setWest(cellB);
+//        cellB.setSouth(cellD);
+//        cellE.setEast(hall4);
+//        hall4.setEast(cellC);
+
+
+//        start.setNorth(new Cell(0,0,ecsEngine)); //parent init bug
+//        start.setEast(hall1);
+//
+//        hall1.setWest(start); //parent
+//        hall1.setEast(cellA);
+//
+//        cellA.setWest(hall1); //parent
+//        cellA.setSouth(hall2);
+//
+//        hall2.setNorth(cellA); //parent
+//        hall2.setSouth(cellE);
+//
+//        cellE.setNorth(hall2); //parent
+//        cellE.setWest(hall3);
+//
+//        hall3.setEast(cellE); //parent
+//        hall3.setWest(cellB);
+//
+//        cellB.setEast(hall3); //parent
+//        cellB.setSouth(cellD);
+//
+//        cellD.setNorth(cellB); //parent
+//
+//        cellE.setEast(hall4);
+//
+//        hall4.setWest(cellE); //parent
+//        hall4.setEast(cellC);
+//
+//        cellC.setWest(hall4);
         return dungeon;
 
     }

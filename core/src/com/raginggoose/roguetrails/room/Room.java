@@ -15,6 +15,7 @@ public abstract class Room {
     public abstract Room getEast();
     public abstract Room getSouth();
     public abstract Room getWest();
+    public abstract Room getParent();
     public abstract void setNorth(Room room);
     public abstract void setEast(Room room);
     public abstract void setSouth(Room room);
@@ -33,6 +34,7 @@ public abstract class Room {
     public abstract String getName();
     public abstract void moveX(int dx);
     public abstract void moveY(int dy);
+    public abstract boolean isParentOf(Room room);
 
 }
 

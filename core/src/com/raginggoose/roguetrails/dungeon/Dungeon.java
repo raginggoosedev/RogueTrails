@@ -80,19 +80,19 @@ public class Dungeon implements Cloneable {
         //room.draw(x,y,shape);
         room.draw(shape);
 
-        if (north != null) {
+        if (north != null && !north.isParentOf(room)) {
             draw(north, shape);
         }
 
-        if (east != null) {
+        if (east != null && !east.isParentOf(room)) {
             draw(east, shape);
         }
 
-        if (south != null) {
+        if (south != null && !south.isParentOf(room)) {
             draw(south, shape);
         }
 
-        if (west != null) {
+        if (west != null && !west.isParentOf(room)) {
             draw(west, shape);
         }
     }
