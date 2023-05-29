@@ -1,6 +1,7 @@
 package com.raginggoose.roguetrails.room;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.raginggoose.roguetrails.collisions.CollisionBox;
 
 import java.awt.*;
 
@@ -15,6 +16,7 @@ public abstract class Room {
     public abstract Room getEast();
     public abstract Room getSouth();
     public abstract Room getWest();
+    public abstract Room getParent();
     public abstract void setNorth(Room room);
     public abstract void setEast(Room room);
     public abstract void setSouth(Room room);
@@ -33,6 +35,7 @@ public abstract class Room {
     public abstract String getName();
     public abstract void moveX(int dx);
     public abstract void moveY(int dy);
+    public abstract boolean isParentOf(Room room);
 
+    public abstract CollisionBox getBox();
 }
-

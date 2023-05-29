@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.raginggoose.roguetrails.RogueTrails;
+import com.raginggoose.roguetrails.collisions.CollisionBox;
+import com.raginggoose.roguetrails.collisions.CollisionWorld;
 import com.raginggoose.roguetrails.ecs.components.*;
 import com.raginggoose.roguetrails.ecs.systems.*;
 import com.raginggoose.roguetrails.inventory.Inventory;
@@ -20,12 +22,15 @@ import com.raginggoose.roguetrails.inventory.Inventory;
  */
 public class ECSEngine extends PooledEngine {
     public final static String TAG = ECSEngine.class.getSimpleName();
+    private final CollisionWorld world;
     public static final Color ENEMY_DEBUG_COLOUR = Color.RED;
     public static final Color PLAYER_DEBUG_COLOUR = Color.BLUE;
     public static final Color ITEM_DEBUG_COLOUR = Color.GREEN;
     private final Entity player;
 
-    public ECSEngine(ShapeRenderer s, SpriteBatch batch, OrthographicCamera cam) {
+    public ECSEngine(ShapeRenderer s, SpriteBatch batch, OrthographicCamera cam, CollisionWorld world) {
+        this.world = world;
+
         if (RogueTrails.DEBUG)
             this.addSystem(new DebugRenderingSystem(s));
 
@@ -34,6 +39,8 @@ public class ECSEngine extends PooledEngine {
         this.addSystem(new EnemyMovementSystem());
 
         this.addSystem(new RenderingSystem(batch));
+
+        this.addSystem(new CollisionSystem());
 
         player = this.createEntity();
         this.addSystem(new InteractionSystem(player));
@@ -65,6 +72,7 @@ public class ECSEngine extends PooledEngine {
         // Transform Component
         TransformComponent transformComponent = this.createComponent(TransformComponent.class);
         transformComponent.position.set(x, y, drawOrder);
+        transformComponent.prevPosition.set(transformComponent.position.x, transformComponent.position.y);
         transformComponent.scale.set(1, 1);
         transformComponent.width = w;
         transformComponent.height = h;
@@ -107,6 +115,13 @@ public class ECSEngine extends PooledEngine {
 
         //animationComponent.animations.put(StateComponent.STATE_RIGHT, movementAnimation);
 
+        // Collision Component
+        CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
+        collisionComponent.box = new CollisionBox(transformComponent.prevPosition, transformComponent.width, transformComponent.height, player);
+        world.addCollisionBox(collisionComponent.box);
+        player.add(collisionComponent);
+
+
         // Debug Component
         if (RogueTrails.DEBUG) {
             DebugComponent debugComponent = this.createComponent(DebugComponent.class);
@@ -129,7 +144,7 @@ public class ECSEngine extends PooledEngine {
      * @param h         the enemy's height
      * @param drawOrder the enemy's layer to be drawn on
      */
-    public void createEnemy(int x, int y, int w, int h, int drawOrder) {
+    public void createEnemy(int x, int y, int w, int h, int drawOrder, float damage) {
         Entity enemy = this.createEntity();
         StringBuilder sBuild = new StringBuilder();
         sBuild.append("----------------------\n");
@@ -139,6 +154,7 @@ public class ECSEngine extends PooledEngine {
         EnemyComponent enemyComponent = this.createComponent(EnemyComponent.class);
         enemyComponent.player = player;
         enemyComponent.speed = 1.0f;
+        enemyComponent.damage = damage;
         enemy.add(enemyComponent);
         sBuild.append("Enemy Speed: ").append(enemyComponent.speed).append("\n");
 
@@ -156,6 +172,12 @@ public class ECSEngine extends PooledEngine {
         RenderComponent renderComponent = this.createComponent(RenderComponent.class);
         renderComponent.shouldRender = true;
         enemy.add(renderComponent);
+
+        // Collision Component
+        CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
+        collisionComponent.box = new CollisionBox(transformComponent.prevPosition, transformComponent.width, transformComponent.height, enemy);
+        world.addCollisionBox(collisionComponent.box);
+        enemy.add(collisionComponent);
 
         // Debug Component
         if (RogueTrails.DEBUG) {
