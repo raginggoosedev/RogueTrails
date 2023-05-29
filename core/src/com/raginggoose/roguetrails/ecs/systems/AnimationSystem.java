@@ -17,7 +17,7 @@ public class AnimationSystem extends IteratingSystem {
     private final ComponentMapper<RenderComponent> renderMapper;
 
     public AnimationSystem() {
-        super(Family.all(PlayerComponent.class).get());
+        super(Family.all(AnimationComponent.class).get());
         animationMapper = Mapper.ANIMATION_MAPPER;
         stateMapper = Mapper.STATE_MAPPER;
         renderMapper = Mapper.RENDER_MAPPER;

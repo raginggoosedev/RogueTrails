@@ -3,6 +3,9 @@ package com.raginggoose.roguetrails.room;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
+import com.raginggoose.roguetrails.collisions.CollisionBox;
+import com.raginggoose.roguetrails.collisions.CollisionWorld;
 import com.raginggoose.roguetrails.ecs.ECSEngine;
 
 
@@ -22,6 +25,7 @@ public class Cell extends Room {
     private Room SOUTH = null;
     private Room WEST = null;
     private Room PARENT = null;
+    private final CollisionBox box;
 
     //Constructor if no parameters given
     /* public Cell() {
@@ -30,10 +34,12 @@ public class Cell extends Room {
     }*/
 
     //Constructor if width and height given
-    public Cell(int w, int h, ECSEngine ecsEngine) {
+    public Cell(int w, int h, ECSEngine ecsEngine, CollisionWorld world) {
         this.w = w;
         this.h = h;
         this.ecsEngine = ecsEngine;
+        box = new CollisionBox(new Vector2(x, y), w, h, this);
+        world.addCollisionBox(box);
     }
 
 
@@ -124,7 +130,7 @@ public class Cell extends Room {
             int enemyX = MathUtils.random(x, x + w - 32);
             int enemyY = MathUtils.random(y, y + h - 32);
 
-            ecsEngine.createEnemy(enemyX, enemyY, 32, 32, 1);
+            ecsEngine.createEnemy(enemyX, enemyY, 32, 32, 1, 1.0f);
         }
     }
 
@@ -166,13 +172,16 @@ public class Cell extends Room {
         y += dy;
     }
 
-    @Override
-    public boolean isParentOf(Room room) {
-        return this == room.getParent();
-    }
-
     public String getName() {
         return name;
     }
 
+    public CollisionBox getBox() {
+        return box;
+    }
+
+    @Override
+    public boolean isParentOf(Room room) {
+        return this == room.getParent();
+    }
 }
