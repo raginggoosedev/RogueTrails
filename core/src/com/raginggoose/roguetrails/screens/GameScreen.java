@@ -9,8 +9,11 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.raginggoose.roguetrails.collisions.CollisionWorld;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
@@ -62,7 +65,7 @@ public class GameScreen implements Screen {
 
 
         ecsEngine = new ECSEngine(shape, batch, cam, world, assetLoader);
-        ecsEngine.createPlayer(10, 10, 64, 64, 0);
+        ecsEngine.createPlayer(10, 10, 32, 32, 0);
 
 
         dun = makeDungeon();
@@ -78,13 +81,12 @@ public class GameScreen implements Screen {
         inventory = playerComponent.inventory;
         hud = new HUD(inventory, skin, playerComponent.health);
 
-        stage = new Stage();
+        stage = new Stage(new ScreenViewport());
         hud.setStage(stage);
     }
 
     @Override
     public void show() {
-
     }
 
     public Dungeon makeDungeon() {
