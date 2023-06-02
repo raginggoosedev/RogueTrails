@@ -43,8 +43,8 @@ public class RogueTrails extends Game {
         assetManager.queueAssets();
         assetManager.manager.finishLoading();
 
-        // Set the first screen to type GAME
-        setScreen(ScreenType.GAME);
+        // Set the first screen to type MENU
+        setScreen(ScreenType.MENU);
     }
 
     @Override

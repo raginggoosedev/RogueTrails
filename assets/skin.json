@@ -1,5 +1,11 @@
 {
 "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+	"FFFFORWA": {
+		"file": "FFFFORWA.fnt",
+		"scaledSize": -1,
+		"markupEnabled": false,
+		"flip": false
+	},
 	"font": {
 		"file": "font-export.fnt",
 		"scaledSize": -1,
@@ -82,9 +88,9 @@
 },
 "com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle": {
 	"default": {
-		"up": "round-gray",
-		"down": "round-dark-gray",
-		"over": "round-light-gray"
+		"up": "buttonup",
+		"down": "buttondown",
+		"over": "buttonhover"
 	},
 	"toggle": {
 		"up": "round-gray",
@@ -198,11 +204,11 @@
 },
 "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
 	"default": {
-		"font": "font",
-		"fontColor": "black",
-		"up": "round-gray",
-		"down": "round-dark-gray",
-		"over": "round-light-gray"
+		"font": "FFFFORWA",
+		"fontColor": "white",
+		"up": "buttonup",
+		"down": "buttondown",
+		"over": "buttonhover"
 	},
 	"toggle": {
 		"font": "font",
