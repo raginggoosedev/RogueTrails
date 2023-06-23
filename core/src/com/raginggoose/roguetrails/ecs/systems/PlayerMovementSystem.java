@@ -34,37 +34,41 @@ public class PlayerMovementSystem extends IteratingSystem {
     }
 
     private Direction checkCollision(float x, float y, float w, float h, Room room) {
-        if (room != null) {
-            int leftBound = room.getX();
-            int rightBound = room.getX() + room.getWidth();
-            int lowerBound = room.getY();
-            int upperBound = room.getY() + room.getHeight();
+        try {
+            if (room != null) {
+                int leftBound = room.getX();
+                int rightBound = room.getX() + room.getWidth();
+                int lowerBound = room.getY();
+                int upperBound = room.getY() + room.getHeight();
 
-            if (x <= leftBound) {
-                if (room.getWest() == null) return Direction.LEFT;
-                if (y < room.getWest().getY() || y + h > room.getWest().getY() + room.getWest().getHeight())
-                    return Direction.LEFT;
-            }
-            if (x + w >= rightBound) {
-                if (room.getEast() == null) return Direction.RIGHT;
-                if (y < room.getEast().getY() || y + h > room.getEast().getY() + room.getEast().getHeight())
-                    return Direction.RIGHT;
-            }
-            if (y <= lowerBound) {
-                if (room.getSouth() == null) return Direction.DOWN;
-                if (x < room.getSouth().getX() || x + w > room.getSouth().getX() + room.getSouth().getWidth())
-                    return Direction.DOWN;
-            }
-            if (y + h >= upperBound) {
-                if (room.getNorth() == null) return Direction.UP;
-                if (x < room.getNorth().getX() || x + w > room.getNorth().getX() + room.getNorth().getWidth())
-                    return Direction.UP;
-            }
+                if (x <= leftBound) {
+                    if (room.getWest() == null) return Direction.LEFT;
+                    if (y < room.getWest().getY() || y + h > room.getWest().getY() + room.getWest().getHeight())
+                        return Direction.LEFT;
+                }
+                if (x + w >= rightBound) {
+                    if (room.getEast() == null) return Direction.RIGHT;
+                    if (y < room.getEast().getY() || y + h > room.getEast().getY() + room.getEast().getHeight())
+                        return Direction.RIGHT;
+                }
+                if (y <= lowerBound) {
+                    if (room.getSouth() == null) return Direction.DOWN;
+                    if (x < room.getSouth().getX() || x + w > room.getSouth().getX() + room.getSouth().getWidth())
+                        return Direction.DOWN;
+                }
+                if (y + h >= upperBound) {
+                    if (room.getNorth() == null) return Direction.UP;
+                    if (x < room.getNorth().getX() || x + w > room.getNorth().getX() + room.getNorth().getWidth())
+                        return Direction.UP;
+                }
 
-            return null;
+                return null;
+            }
+        } catch (NullPointerException e) {
+            //TODO Josh fix bug please
+            Gdx.app.error("ERROR", " JOSH YOUR NULL POINTER PROBLEM!");
         }
-        //TODO Josh fix bug please
-        throw new NullPointerException("Player's room is null!");
+        return null;
     }
 
     @Override
