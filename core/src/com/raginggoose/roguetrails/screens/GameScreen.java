@@ -1,37 +1,36 @@
 package com.raginggoose.roguetrails.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
-
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.raginggoose.roguetrails.collisions.CollisionWorld;
-import com.raginggoose.roguetrails.ecs.Mapper;
-import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
-import com.raginggoose.roguetrails.hud.HUD;
-import com.raginggoose.roguetrails.inventory.Inventory;
-import com.raginggoose.roguetrails.loader.AssetLoader;
 import com.raginggoose.roguetrails.RogueTrails;
+import com.raginggoose.roguetrails.collisions.CollisionWorld;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.ECSEngine;
+import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.ItemComponent;
+import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
+import com.raginggoose.roguetrails.ecs.systems.DebugRenderingSystem;
 import com.raginggoose.roguetrails.ecs.systems.PlayerMovementSystem;
+import com.raginggoose.roguetrails.ecs.systems.RenderingSystem;
+import com.raginggoose.roguetrails.hud.HUD;
+import com.raginggoose.roguetrails.hud.Menu;
+import com.raginggoose.roguetrails.inventory.Inventory;
+import com.raginggoose.roguetrails.loader.AssetLoader;
 import com.raginggoose.roguetrails.room.Cell;
 import com.raginggoose.roguetrails.room.Hallway;
 import com.raginggoose.roguetrails.room.Orientation;
 import com.raginggoose.roguetrails.room.Room;
 
 public class GameScreen implements Screen {
-    public Dungeon dun;
     private final RogueTrails game;
     private final SpriteBatch batch;
     private final ECSEngine ecsEngine;
@@ -45,6 +44,10 @@ public class GameScreen implements Screen {
     private final Inventory inventory;
     private final CollisionWorld world;
     private final PlayerComponent playerComponent;
+    private final Menu menu;
+    public Dungeon dun;
+    private boolean paused;
+
     /**
      * Create a new game screen to display and play the game
      *
@@ -79,10 +82,15 @@ public class GameScreen implements Screen {
 
         playerComponent = Mapper.PLAYER_MAPPER.get(ecsEngine.getPlayer());
         inventory = playerComponent.inventory;
-        hud = new HUD(inventory, skin, playerComponent.health);
 
         stage = new Stage(new ScreenViewport());
-        hud.setStage(stage);
+
+        Gdx.input.setInputProcessor(stage);
+
+        hud = new HUD(inventory, skin, playerComponent.health, stage);
+        menu = new Menu(stage, skin, game);
+
+        paused = false;
     }
 
     @Override
@@ -131,22 +139,44 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.2f, 0.75f, 0.5f, 1);
-        // Draw a small rectangle
-        shape.setProjectionMatrix(cam.combined);
-        shape.begin(ShapeRenderer.ShapeType.Line);
-        assetLoader.queueAssets();
 
-        dun.draw(shape);
+        if (!paused) {
+            if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
+                pause();
 
-        shape.end();
+            // Draw a small rectangle
+            shape.setProjectionMatrix(cam.combined);
+            shape.begin(ShapeRenderer.ShapeType.Line);
+            assetLoader.queueAssets();
 
-        batch.setProjectionMatrix(cam.combined);
-        //TODO add collision system to ecs
-        ecsEngine.update(delta);
-        world.update();
+            dun.draw(shape);
 
-        hud.updateInventory(inventory);
-        hud.updateHealth(playerComponent.health);
+            shape.end();
+
+            batch.setProjectionMatrix(cam.combined);
+            //TODO add collision system to ecs
+            ecsEngine.update(delta);
+            world.update();
+
+            hud.updateInventory(inventory);
+            hud.updateHealth(playerComponent.health);
+        } else {
+
+            assetLoader.queueAssets();
+            batch.setProjectionMatrix(cam.combined);
+
+            // Only update drawing/rendering
+            ecsEngine.getSystem(RenderingSystem.class).update(delta);
+
+            if (RogueTrails.DEBUG)
+                ecsEngine.getSystem(DebugRenderingSystem.class).update(delta);
+
+            // Draw a small rectangle
+            shape.setProjectionMatrix(cam.combined);
+            shape.begin(ShapeRenderer.ShapeType.Line);
+            dun.draw(shape);
+            shape.end();
+        }
         stage.draw();
         stage.act(delta);
     }
@@ -158,7 +188,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
-
+        paused = true;
+        menu.show();
     }
 
     @Override

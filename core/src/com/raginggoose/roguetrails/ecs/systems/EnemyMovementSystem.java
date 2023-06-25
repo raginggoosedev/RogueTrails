@@ -3,11 +3,14 @@ package com.raginggoose.roguetrails.ecs.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.EnemyComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
+import com.raginggoose.roguetrails.room.Direction;
+import com.raginggoose.roguetrails.room.Room;
 
 /**
  * The system used to make the enemy entities move towards the player
