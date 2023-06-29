@@ -1,6 +1,5 @@
 package com.raginggoose.roguetrails.hud;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,10 +15,19 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.screens.ScreenType;
 
+/**
+ * In-game menu that pauses gameplay and displays options
+ */
 public class Menu {
     private final Table table;
     private final Stage stage;
 
+    /**
+     * Creates a new menu
+     * @param stage the stage for the menu to be drawn on
+     * @param skin the skin used for the actors
+     * @param game the game being played
+     */
     public Menu(Stage stage, Skin skin, RogueTrails game) {
         this.stage = stage;
 
@@ -40,10 +48,23 @@ public class Menu {
         table.row().expandX().expandY();
         TextButton textButton = new TextButton("Resume", skin);
         table.add(textButton).padTop(80.0f).padBottom(20.0f).padLeft(140.0f).padRight(140.0f).expandX().expandY().fill();
+        textButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.getScreen().resume();
+            }
+        });
 
         table.row().expandX().expandY();
         textButton = new TextButton("Settings", skin);
         table.add(textButton).padTop(20.0f).padBottom(20.0f).padLeft(140.0f).padRight(140.0f).expandX().expandY().fill();
+        textButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Fade out then go to settings screen
+                stage.addAction(Actions.sequence(Actions.fadeOut(0.75f), Actions.run(() -> game.setScreen(ScreenType.SETTINGS))));
+            }
+        });
 
         table.row().expandX().expandY();
         textButton = new TextButton("Quit to Menu", skin);
@@ -62,5 +83,9 @@ public class Menu {
 
     public void show() {
         table.setVisible(true);
+    }
+
+    public void hide() {
+        table.setVisible(false);
     }
 }
