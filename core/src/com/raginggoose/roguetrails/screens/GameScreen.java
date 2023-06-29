@@ -8,10 +8,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.raginggoose.roguetrails.RogueTrails;
+import com.raginggoose.roguetrails.audio.AudioType;
 import com.raginggoose.roguetrails.collisions.CollisionWorld;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.ECSEngine;
@@ -61,6 +63,9 @@ public class GameScreen implements Screen {
         assetLoader = game.getAssetManager();
         shape = new ShapeRenderer();
 
+        if (game.getPreferences().isMusicEnabled())
+            game.getAudioManager().playAudio(AudioType.BACKGROUND);
+
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -85,7 +90,6 @@ public class GameScreen implements Screen {
 
         stage = new Stage(new ScreenViewport());
 
-        Gdx.input.setInputProcessor(stage);
 
         hud = new HUD(inventory, skin, playerComponent.health, stage);
         menu = new Menu(stage, skin, game);
@@ -95,6 +99,12 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        Gdx.input.setInputProcessor(stage);
+        stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1)));
+
+        if (paused) {
+            resume();
+        }
     }
 
     public Dungeon makeDungeon() {
@@ -194,7 +204,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void resume() {
-
+        paused = false;
+        menu.hide();
     }
 
     @Override

@@ -24,11 +24,6 @@ public class MenuScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         skin = game.getAssetManager().manager.get(AssetLoader.GAME_SKIN);
         this.game = game;
-    }
-
-    @Override
-    public void show() {
-        Gdx.input.setInputProcessor(stage);
 
         Table table = new Table();
         table.setFillParent(true);
@@ -49,6 +44,13 @@ public class MenuScreen implements Screen {
 
         table.row().expandX().expandY();
         textButton = new TextButton("Settings", skin);
+        textButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Fade out then change to game screen
+                stage.addAction(Actions.sequence(Actions.fadeOut(0.75f), Actions.run(() -> game.setScreen(ScreenType.SETTINGS))));
+            }
+        });
         table.add(textButton).padTop(10.0f).padBottom(10.0f).padLeft(140.0f).padRight(140.0f).expandX().expandY().fill();
 
         table.row().expandX().expandY();
@@ -62,7 +64,11 @@ public class MenuScreen implements Screen {
         });
         table.add(textButton).padTop(10.0f).padBottom(20.0f).padLeft(140.0f).padRight(140.0f).expandX().expandY().fill();
         stage.addActor(table);
+    }
 
+    @Override
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
         stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1)));
     }
 

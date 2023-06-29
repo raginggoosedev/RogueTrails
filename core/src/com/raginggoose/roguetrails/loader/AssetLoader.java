@@ -2,11 +2,13 @@ package com.raginggoose.roguetrails.loader;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class AssetLoader {
+    public static final String BACKGROUND_MUSIC = "audio/background.ogg";
     public final AssetManager manager = new AssetManager();
 
     // Textures
@@ -23,5 +25,6 @@ public class AssetLoader {
         manager.load(PLAYER_TEXTURE, Texture.class);
         manager.load(SKIN_ATLAS, TextureAtlas.class);
         manager.load(GAME_SKIN, Skin.class, new SkinLoader.SkinParameter(SKIN_ATLAS));
+        manager.load(BACKGROUND_MUSIC, Music.class);
     }
 }
