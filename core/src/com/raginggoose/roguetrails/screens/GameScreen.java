@@ -170,7 +170,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        cam.setToOrtho(false, width, height);
+        cam.update();
     }
 
     @Override
