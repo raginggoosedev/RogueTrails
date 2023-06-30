@@ -151,42 +151,19 @@ public class GameScreen implements Screen {
         ScreenUtils.clear(0.2f, 0.75f, 0.5f, 1);
 
         if (!paused) {
-            if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
-                pause();
-
-            // Draw a small rectangle
-            shape.setProjectionMatrix(cam.combined);
-            shape.begin(ShapeRenderer.ShapeType.Line);
-            assetLoader.queueAssets();
-
-            dun.draw(shape);
-
-            shape.end();
-
-            batch.setProjectionMatrix(cam.combined);
-            //TODO add collision system to ecs
-            ecsEngine.update(delta);
-            world.update();
+            // Game is not paused, logic and rendering should be done
+            processInput();
+            updateGameLogic(delta);
+            drawGame();
 
             hud.updateInventory(inventory);
             hud.updateHealth(playerComponent.health);
         } else {
-
-            assetLoader.queueAssets();
-            batch.setProjectionMatrix(cam.combined);
-
-            // Only update drawing/rendering
-            ecsEngine.getSystem(RenderingSystem.class).update(delta);
-
-            if (RogueTrails.DEBUG)
-                ecsEngine.getSystem(DebugRenderingSystem.class).update(delta);
-
-            // Draw a small rectangle
-            shape.setProjectionMatrix(cam.combined);
-            shape.begin(ShapeRenderer.ShapeType.Line);
-            dun.draw(shape);
-            shape.end();
+            // Game is paused, only rendering should be done
+            drawPausedGame(delta);
         }
+
+        // Stage is drawn regardless
         stage.draw();
         stage.act(delta);
     }
@@ -217,5 +194,52 @@ public class GameScreen implements Screen {
     public void dispose() {
         shape.dispose();
         stage.dispose();
+    }
+
+    private void processInput() {
+        // If escape is pressed, the game is paused
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
+            pause();
+    }
+
+    private void updateGameLogic(float delta) {
+        // Update entities and the physics world
+        ecsEngine.update(delta);
+        world.update();
+    }
+
+    private void drawGame() {
+        // Draw a small rectangle
+        shape.setProjectionMatrix(cam.combined);
+        shape.begin(ShapeRenderer.ShapeType.Line);
+        assetLoader.queueAssets();
+
+        dun.draw(shape);
+
+        shape.end();
+
+        // Set up projection matrix for rendering system
+        batch.setProjectionMatrix(cam.combined);
+    }
+
+    /**
+     * A method to continue rendering the game while it is paused
+     * @param delta Time between the previous and current call to render()
+     */
+    private void drawPausedGame(float delta) {
+        batch.setProjectionMatrix(cam.combined);
+
+        // Only use the render system so that the game is still rendered
+        ecsEngine.getSystem(RenderingSystem.class).update(delta);
+
+        if (RogueTrails.DEBUG) {
+            // Show debug rendering if the game is run in debug mode
+            ecsEngine.getSystem(DebugRenderingSystem.class).update(delta);
+        }
+
+        shape.setProjectionMatrix(cam.combined);
+        shape.begin(ShapeRenderer.ShapeType.Line);
+        dun.draw(shape);
+        shape.end();
     }
 }
