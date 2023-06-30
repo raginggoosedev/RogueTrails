@@ -172,6 +172,8 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         cam.setToOrtho(false, width, height);
         cam.update();
+        stage.getViewport().update(width, height, true);
+        hud.resize(width, height);
     }
 
     @Override
