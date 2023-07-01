@@ -22,47 +22,57 @@ public class CollisionWorld {
      * Updates the world, checking for any collisions between collision boxes
      */
     public void update() {
-        for (CollisionBox a : world) {
-            for (CollisionBox b : world) {
-                if (!a.equals(b)) {
-                    Vector2 posA = a.getPosition();
-                    Vector2 posB = b.getPosition();
+        for (int i = 0; i < world.size(); i++) {
+            CollisionBox boxA = world.get(i);
+            for (int j = i + 1; j < world.size(); j++) {
+                CollisionBox boxB = world.get(j);
+                checkCollision(boxA, boxB);
+            }
+        }
+    }
 
-                    if (!a.isStatic() && !b.isStatic()) {
-                        if (posA.x < posB.x + b.getWidth() && posA.x + a.getWidth() > posB.x && posA.y < posB.y + b.getHeight() && posA.y + a.getHeight() > posB.y) {
-                            // Entity on entity collisions
-                            a.setCollision(true);
-                            CollisionComponent collA = Mapper.COLLISION_MAPPER.get(a.getEntity());
-                            collA.collisionBox = b;
-                            collA.collided = true;
+    private void checkCollision(CollisionBox boxA, CollisionBox boxB) {
+        if (!boxA.equals(boxB)) {
+            Vector2 posA = boxA.getPosition();
+            Vector2 posB = boxB.getPosition();
 
-                            b.setCollision(true);
-                            CollisionComponent collB = Mapper.COLLISION_MAPPER.get(b.getEntity());
-                            collB.collisionBox = a;
-                            collB.collided = true;
-                        }
-                    } else if (dungeon != null) {
-                        if (!a.isStatic() && b.getRoom().equals(dungeon.getCurrentRoom(posA.x, posA.y))) {
-                            if ((posA.x > posB.x + b.getWidth() || posA.x + a.getWidth() < posB.x) && (posA.y > posB.y + b.getHeight() || posA.y + a.getHeight() < posB.y)) {
-                                // Box A is an entity colliding into the static box B
-                                CollisionComponent collA = Mapper.COLLISION_MAPPER.get(a.getEntity());
-                                a.setCollision(true);
-                                collA.collisionBox = b;
-                                collA.collided = true;
-                            }
-                        } else if (!b.isStatic() && a.getRoom().equals(dungeon.getCurrentRoom(posB.x, posB.y))) {
-                            if ((posB.x > posA.x + a.getWidth() || posB.x + b.getWidth() < posA.x) && (posB.y > posA.y + a.getHeight() || posB.y + b.getHeight() < posA.y)) {
-                                // Box B is an entity colling into the static box A
-                                CollisionComponent collB = Mapper.COLLISION_MAPPER.get(b.getEntity());
-                                collB.collisionBox = a;
-                                collB.collided = true;
-                            }
-                        }
+            if (!boxA.isStatic() && !boxB.isStatic()) {
+                if (posA.x < posB.x + boxB.getWidth() && posA.x + boxA.getWidth() > posB.x &&
+                        posA.y < posB.y + boxB.getHeight() && posA.y + boxA.getHeight() > posB.y) {
+                    handleEntityCollision(boxA, boxB);
+                }
+            } else if (dungeon != null) {
+                if (!boxA.isStatic() && boxB.getRoom().equals(dungeon.getCurrentRoom(posA.x, posA.y))) {
+                    if ((posA.x > posB.x + boxB.getWidth() || posA.x + boxA.getWidth() < posB.x) &&
+                            (posA.y > posB.y + boxB.getHeight() || posA.y + boxA.getHeight() < posB.y)) {
+                        handleStaticCollision(boxA, boxB);
+                    }
+                } else if (!boxB.isStatic() && boxA.getRoom().equals(dungeon.getCurrentRoom(posB.x, posB.y))) {
+                    if ((posB.x > posA.x + boxA.getWidth() || posB.x + boxB.getWidth() < posA.x) &&
+                            (posB.y > posA.y + boxA.getHeight() || posB.y + boxB.getHeight() < posA.y)) {
+                        handleStaticCollision(boxB, boxA);
                     }
                 }
             }
         }
+    }
 
+    private void handleEntityCollision(CollisionBox boxA, CollisionBox boxB) {
+        boxA.setCollision(true);
+        CollisionComponent collA = Mapper.COLLISION_MAPPER.get(boxA.getEntity());
+        collA.collisionBox = boxB;
+        collA.collided = true;
+
+        boxB.setCollision(true);
+        CollisionComponent collB = Mapper.COLLISION_MAPPER.get(boxB.getEntity());
+        collB.collisionBox = boxA;
+        collB.collided = true;
+    }
+
+    private void handleStaticCollision(CollisionBox entityBox, CollisionBox staticBox) {
+        CollisionComponent coll = Mapper.COLLISION_MAPPER.get(entityBox.getEntity());
+        coll.collisionBox = staticBox;
+        coll.collided = true;
     }
 
     public void addCollisionBox(CollisionBox newBox) {

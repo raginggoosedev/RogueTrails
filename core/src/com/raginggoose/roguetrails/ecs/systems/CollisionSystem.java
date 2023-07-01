@@ -20,7 +20,7 @@ public class CollisionSystem extends IteratingSystem {
     }
 
     @Override
-    protected void processEntity(Entity entity, float v) {
+    protected void processEntity(Entity entity, float delta) {
         TransformComponent transformComp = Mapper.TRANSFORM_MAPPER.get(entity);
         CollisionComponent collComp = Mapper.COLLISION_MAPPER.get(entity);
 
@@ -40,7 +40,8 @@ public class CollisionSystem extends IteratingSystem {
             } else if (collComp.collided) {
                 // Player collided with static boundary
                 System.out.println("HIT A WALL!");
-
+                // Restore the player's previous position to prevent movement outside the walls
+                transformComp.position.set(transformComp.prevPosition.x, transformComp.prevPosition.y, transformComp.position.z);
             }
         }
 
