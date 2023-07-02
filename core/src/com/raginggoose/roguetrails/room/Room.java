@@ -36,7 +36,5 @@ public abstract class Room {
     public abstract void moveX(int dx);
     public abstract void moveY(int dy);
     public abstract boolean isParentOf(Room room);
-
-    public abstract CollisionBox getBox();
     public abstract void setParent(Room room);
 }

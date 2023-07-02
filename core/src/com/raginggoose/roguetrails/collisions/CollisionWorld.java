@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.CollisionComponent;
+import com.raginggoose.roguetrails.room.Direction;
 
 import java.util.ArrayList;
 
@@ -37,20 +38,24 @@ public class CollisionWorld {
             Vector2 posB = boxB.getPosition();
 
             if (!boxA.isStatic() && !boxB.isStatic()) {
+                // Entity-entity collision
                 if (posA.x < posB.x + boxB.getWidth() && posA.x + boxA.getWidth() > posB.x &&
                         posA.y < posB.y + boxB.getHeight() && posA.y + boxA.getHeight() > posB.y) {
                     handleEntityCollision(boxA, boxB);
                 }
-            } else if (dungeon != null) {
-                if (!boxA.isStatic() && boxB.getRoom().equals(dungeon.getCurrentRoom(posA.x, posA.y))) {
-                    if ((posA.x > posB.x + boxB.getWidth() || posA.x + boxA.getWidth() < posB.x) &&
-                            (posA.y > posB.y + boxB.getHeight() || posA.y + boxA.getHeight() < posB.y)) {
-                        handleStaticCollision(boxA, boxB);
-                    }
-                } else if (!boxB.isStatic() && boxA.getRoom().equals(dungeon.getCurrentRoom(posB.x, posB.y))) {
-                    if ((posB.x > posA.x + boxA.getWidth() || posB.x + boxB.getWidth() < posA.x) &&
-                            (posB.y > posA.y + boxA.getHeight() || posB.y + boxB.getHeight() < posA.y)) {
+            } else if (dungeon != null && dungeon.getCurrentRoom(boxA.getPosition().x, boxA.getPosition().y) != null && dungeon.getCurrentRoom(boxB.getPosition().x, boxB.getPosition().y) != null) {
+                // Static-entity collision
+                if (boxA.isStatic() && !boxB.isStatic() && dungeon.getCurrentRoom(boxB.getPosition().x, boxB.getPosition().y).equals(boxA.getRoom())) {
+                    // Check if the non-static box touches the static walls
+                    if (posB.x <= posA.x + boxA.getWidth() && posB.x + boxB.getWidth() >= posA.x &&
+                            posB.y <= posA.y + boxA.getHeight() && posB.y + boxB.getHeight() >= posA.y) {
                         handleStaticCollision(boxB, boxA);
+                    }
+                } else if (!boxA.isStatic() && boxB.isStatic() && dungeon.getCurrentRoom(boxA.getPosition().x, boxA.getPosition().y).equals(boxB.getRoom())) {
+                    // Check if the non-static box touches the static walls
+                    if (posA.x < posB.x + boxB.getWidth() && posA.x + boxA.getWidth() > posB.x &&
+                            posA.y < posB.y + boxB.getHeight() && posA.y + boxA.getHeight() > posB.y) {
+                        handleStaticCollision(boxA, boxB);
                     }
                 }
             }
@@ -67,9 +72,61 @@ public class CollisionWorld {
         CollisionComponent collB = Mapper.COLLISION_MAPPER.get(boxB.getEntity());
         collB.collisionBox = boxA;
         collB.collided = true;
+
+        float overlapX = Math.min(boxA.getPosition().x + boxB.getWidth(), boxA.getPosition().x + boxB.getWidth()) -
+                Math.max(boxA.getPosition().x, boxB.getPosition().x);
+        float overlapY = Math.min(boxA.getPosition().y + boxA.getHeight(), boxB.getPosition().y + boxB.getHeight()) -
+                Math.max(boxA.getPosition().y, boxB.getPosition().y);
+
+        if (overlapX < overlapY) {
+            // Horizontal collision
+            if (boxA.getCenterX() < boxB.getCenterX()) {
+                boxA.setCollisionDirection(Direction.RIGHT);
+                boxB.setCollisionDirection(Direction.LEFT);
+            } else {
+                boxA.setCollisionDirection(Direction.LEFT);
+                boxB.setCollisionDirection(Direction.RIGHT);
+            }
+        } else {
+            // Vertical collision
+            if (boxA.getCenterY() < boxB.getCenterY()) {
+                boxA.setCollisionDirection(Direction.UP);
+                boxB.setCollisionDirection(Direction.DOWN);
+            } else {
+                boxA.setCollisionDirection(Direction.DOWN);
+                boxB.setCollisionDirection(Direction.UP);
+            }
+        }
     }
 
     private void handleStaticCollision(CollisionBox entityBox, CollisionBox staticBox) {
+        System.out.println("YOU STUPID NI-");
+        float overlapX = Math.min(entityBox.getPosition().x + entityBox.getWidth(), staticBox.getPosition().x + staticBox.getWidth()) -
+                Math.max(entityBox.getPosition().x, staticBox.getPosition().x);
+        float overlapY = Math.min(entityBox.getPosition().y + entityBox.getHeight(), staticBox.getPosition().y + staticBox.getHeight()) -
+                Math.max(entityBox.getPosition().y, staticBox.getPosition().y);
+
+        if (overlapX < overlapY) {
+            // Horizontal collision
+            if (entityBox.getCenterX() < staticBox.getCenterX()) {
+                entityBox.setCollisionDirection(Direction.RIGHT);
+                staticBox.setCollisionDirection(Direction.LEFT);
+            } else {
+                entityBox.setCollisionDirection(Direction.LEFT);
+                staticBox.setCollisionDirection(Direction.RIGHT);
+            }
+        } else {
+            // Vertical collision
+            if (entityBox.getCenterY() < staticBox.getCenterY()) {
+                entityBox.setCollisionDirection(Direction.UP);
+                staticBox.setCollisionDirection(Direction.DOWN);
+            } else {
+                entityBox.setCollisionDirection(Direction.DOWN);
+                staticBox.setCollisionDirection(Direction.UP);
+            }
+        }
+
+
         CollisionComponent coll = Mapper.COLLISION_MAPPER.get(entityBox.getEntity());
         coll.collisionBox = staticBox;
         coll.collided = true;
@@ -85,5 +142,9 @@ public class CollisionWorld {
 
     public void setDungeon(Dungeon dungeon) {
         this.dungeon = dungeon;
+    }
+
+    public void removeCollisionBox(CollisionBox box) {
+        world.remove(box);
     }
 }

@@ -24,30 +24,22 @@ public class CollisionSystem extends IteratingSystem {
         TransformComponent transformComp = Mapper.TRANSFORM_MAPPER.get(entity);
         CollisionComponent collComp = Mapper.COLLISION_MAPPER.get(entity);
 
-        // Update entity's collision box position
         Vector2 pos = new Vector2(transformComp.position.x, transformComp.position.y);
         collComp.box.updatePosition(pos);
 
         PlayerComponent playerComp = Mapper.PLAYER_MAPPER.get(entity);
         if (playerComp != null) {
-            // Handle player entity's collisions
             if (collComp.collided && collComp.collisionBox.getEntity() != null) {
                 if (Mapper.ENEMY_MAPPER.get(collComp.collisionBox.getEntity()) != null) {
-                    // Get enemy information from collided entity
                     EnemyComponent enemyComp = Mapper.ENEMY_MAPPER.get(collComp.collisionBox.getEntity());
                     playerComp.health -= enemyComp.damage;
+                } else if (Mapper.ITEM_MAPPER.get(collComp.collisionBox.getEntity()) != null) {
+                    // Do item stuff
+                    collComp.collided = false;
+                    collComp.box.setCollision(false);
+                    collComp.collisionBox = null;
                 }
-            } else if (collComp.collided) {
-                // Player collided with static boundary
-                System.out.println("HIT A WALL!");
-                // Restore the player's previous position to prevent movement outside the walls
-                transformComp.position.set(transformComp.prevPosition.x, transformComp.prevPosition.y, transformComp.position.z);
             }
         }
-
-        // Reset the entity's collision component
-        collComp.collided = false;
-        collComp.box.setCollision(false);
-        collComp.collisionBox = null;
     }
 }

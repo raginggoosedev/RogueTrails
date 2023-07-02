@@ -77,7 +77,7 @@ public class GameScreen implements Screen {
 
 
         dun = makeDungeon();
-        dun.updateBoxes();
+        dun.createCollisionBoxes();
 
         spawnItems(dun.getStart(), 200, 100);
 
@@ -119,7 +119,7 @@ public class GameScreen implements Screen {
         Cell cellC = new Cell(1000, 1000, ecsEngine, world);
         Cell cellE = new Cell(80, 80, ecsEngine, world);
 
-        Dungeon dungeon = new Dungeon(start, null);
+        Dungeon dungeon = new Dungeon(start, null, world);
 
         start.setEast(hall1);
         hall1.setEast(cellA);
@@ -207,8 +207,8 @@ public class GameScreen implements Screen {
 
     private void updateGameLogic(float delta) {
         // Update entities and the physics world
-        ecsEngine.update(delta);
         world.update();
+        ecsEngine.update(delta);
     }
 
     private void drawGame() {

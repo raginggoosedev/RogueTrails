@@ -6,14 +6,15 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.Mapper;
+import com.raginggoose.roguetrails.ecs.components.CollisionComponent;
 import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
 import com.raginggoose.roguetrails.ecs.components.StateComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
 import com.raginggoose.roguetrails.room.Direction;
-import com.raginggoose.roguetrails.room.Room;
 
 /**
  * The system used to move the player based on user input
@@ -22,76 +23,55 @@ public class PlayerMovementSystem extends IteratingSystem {
     private final Dungeon dun;
     private final ComponentMapper<StateComponent> stateMapper;
 
-    /**
-     * Creates a new player movement system with the dungeon as a parameter
-     *
-     * @param dun the dungeon to be used for collision detection
-     */
     public PlayerMovementSystem(Dungeon dun) {
-        super(Family.all(PlayerComponent.class).get());
+        super(Family.all(PlayerComponent.class, TransformComponent.class, CollisionComponent.class).get());
         this.dun = dun;
         stateMapper = Mapper.STATE_MAPPER;
-    }
-
-    private Direction checkCollision(float x, float y, float w, float h, Room room) {
-        try {
-            if (room != null) {
-                int leftBound = room.getX();
-                int rightBound = room.getX() + room.getWidth();
-                int lowerBound = room.getY();
-                int upperBound = room.getY() + room.getHeight();
-
-                if (x <= leftBound) {
-                    if (room.getWest() == null) return Direction.LEFT;
-                    if (y < room.getWest().getY() || y + h > room.getWest().getY() + room.getWest().getHeight())
-                        return Direction.LEFT;
-                }
-                if (x + w >= rightBound) {
-                    if (room.getEast() == null) return Direction.RIGHT;
-                    if (y < room.getEast().getY() || y + h > room.getEast().getY() + room.getEast().getHeight())
-                        return Direction.RIGHT;
-                }
-                if (y <= lowerBound) {
-                    if (room.getSouth() == null) return Direction.DOWN;
-                    if (x < room.getSouth().getX() || x + w > room.getSouth().getX() + room.getSouth().getWidth())
-                        return Direction.DOWN;
-                }
-                if (y + h >= upperBound) {
-                    if (room.getNorth() == null) return Direction.UP;
-                    if (x < room.getNorth().getX() || x + w > room.getNorth().getX() + room.getNorth().getWidth())
-                        return Direction.UP;
-                }
-
-                return null;
-            }
-        } catch (NullPointerException e) {
-            //TODO Josh fix bug please
-            Gdx.app.error("ERROR", " JOSH YOUR NULL POINTER PROBLEM!");
-        }
-        return null;
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         TransformComponent transform = Mapper.TRANSFORM_MAPPER.get(entity);
         PlayerComponent playerComponent = Mapper.PLAYER_MAPPER.get(entity);
+        CollisionComponent collisionComponent = Mapper.COLLISION_MAPPER.get(entity);
 
         float speed = playerComponent.speed;
         final StateComponent stateComponent = stateMapper.get(entity);
         Vector3 pos = transform.position;
-        transform.prevPosition.set(pos.x, pos.y);
+        Vector2 prevPos = transform.prevPosition;
+
+        if (!collisionComponent.collided) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W)) pos.add(0, speed, 0);
+            else if (Gdx.input.isKeyPressed(Input.Keys.S)) pos.add(0, -speed, 0);
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) pos.add(-speed, 0, 0);
+            else if (Gdx.input.isKeyPressed(Input.Keys.D)) pos.add(speed, 0, 0);
+            stateComponent.setState(StateComponent.STATE_RIGHT);
+        } else {
+            Direction collisionDirection = collisionComponent.collisionBox.getCollisionDirection();
+            float overlapX = collisionComponent.collisionOverlapX;
+            float overlapY = collisionComponent.collisionOverlapY;
+
+            // Revert to previous position
+            pos.set(prevPos.x, prevPos.y, transform.position.z);
+
+            // Adjust position based on collision direction
+            if (collisionDirection.equals(Direction.RIGHT))
+                pos.add(overlapX + 1, 0, 0);
+            else if (collisionDirection.equals(Direction.LEFT))
+                pos.add(-(overlapX + 1), 0, 0);
+            else if (collisionDirection.equals(Direction.UP))
+                pos.add(0, overlapY + 1, 0);
+            else if (collisionDirection.equals(Direction.DOWN))
+                pos.add(0, -(overlapY + 1), 0);
+
+            collisionComponent.collided = false;
+            collisionComponent.box.setCollision(false);
+            collisionComponent.collisionBox = null;
+        }
 
         dun.getCurrentRoom(transform.position.x, transform.position.y);
-        Direction dir = checkCollision(pos.x, pos.y, transform.width, transform.height, dun.getCurrentRoom(pos.x, pos.y));
 
-        // Determine which input was pressed, then add or subtract from the position vector accordingly
-        if (Gdx.input.isKeyPressed(Input.Keys.W) && dir != Direction.UP) transform.position.add(0, speed, 0);
-        else if (Gdx.input.isKeyPressed(Input.Keys.S) && dir != Direction.DOWN) transform.position.add(0, -speed, 0);
-
-        if (Gdx.input.isKeyPressed(Input.Keys.A) && dir != Direction.LEFT)
-            transform.position.add(-speed, 0, 0);
-        else if (Gdx.input.isKeyPressed(Input.Keys.D) && dir != Direction.RIGHT)
-            transform.position.add(speed, 0, 0);
-        stateComponent.setState(StateComponent.STATE_RIGHT);
+        transform.prevPosition.set(pos.x, pos.y);
+        transform.position.set(pos);
     }
 }

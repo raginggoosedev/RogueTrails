@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.raginggoose.roguetrails.ecs.Mapper;
+import com.raginggoose.roguetrails.ecs.components.CollisionComponent;
 import com.raginggoose.roguetrails.ecs.components.EnemyComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
 import com.raginggoose.roguetrails.room.Direction;
@@ -41,7 +42,29 @@ public class EnemyMovementSystem extends IteratingSystem {
         // Find the angle of the difference x and y
         float angle = MathUtils.atan2(diffY, diffX);
 
-        if (diffX < -1 || diffX > 1) enemyPos.add(speed * MathUtils.cos(angle), 0, 0);
-        if (diffY < -1 || diffY > 1) enemyPos.add(0, speed * MathUtils.sin(angle), 0);
+        CollisionComponent collisionComponent = Mapper.COLLISION_MAPPER.get(entity);
+
+        if (!collisionComponent.collided) {
+            if (diffX < -1 || diffX > 1) enemyPos.add(speed * MathUtils.cos(angle), 0, 0);
+            if (diffY < -1 || diffY > 1) enemyPos.add(0, speed * MathUtils.sin(angle), 0);
+        } else {
+            Direction collisionDirection = collisionComponent.collisionBox.getCollisionDirection();
+            float overlapX = collisionComponent.collisionOverlapX;
+            float overlapY = collisionComponent.collisionOverlapY;
+
+            // Adjust position based on collision direction
+            if (collisionDirection.equals(Direction.RIGHT))
+                enemyPos.add(overlapX + 2, 0, 0);
+            else if (collisionDirection.equals(Direction.LEFT))
+                enemyPos.add(-(overlapX + 2), 0, 0);
+            else if (collisionDirection.equals(Direction.UP))
+                enemyPos.add(0, overlapY + 2, 0);
+            else if (collisionDirection.equals(Direction.DOWN))
+                enemyPos.add(0, -(overlapY + 2), 0);
+
+            collisionComponent.collided = false;
+            collisionComponent.box.setCollision(false);
+            collisionComponent.collisionBox = null;
+        }
     }
 }

@@ -6,15 +6,18 @@ import com.badlogic.gdx.math.Vector2;
 import com.raginggoose.roguetrails.collisions.CollisionBox;
 import com.raginggoose.roguetrails.collisions.CollisionWorld;
 
+import java.util.ArrayList;
+
 
 public class Hallway extends Room {
 
+    private static final float WALL_WIDTH = 5;
     //Room attributes
     private final int w;
     private final int h;
-    private final CollisionBox box;
     private final RoomType TYPE = RoomType.HALLWAY;
     private final Orientation ORIENTATION;
+    private final CollisionWorld world;
     public String name;
     private int x = 0;
     private int y = 0;
@@ -24,25 +27,26 @@ public class Hallway extends Room {
     private Room SOUTH = null;
     private Room WEST = null;
     private Room PARENT = null;
+    private ArrayList<CollisionBox> collisionBoxes;
 
     //constructor without dimensions
     public Hallway(Orientation orientation, CollisionWorld world) {
+        this.world = world;
         ORIENTATION = orientation;
         w = getDefaultWidth(orientation);
         h = getDefaultHeight(orientation);
 
-        box = new CollisionBox(new Vector2(x, y), w, h, this);
-        world.addCollisionBox(box);
+        collisionBoxes = new ArrayList<>();
     }
 
     //constructor with dimensions
     public Hallway(int w, int h, Orientation orientation, CollisionWorld world) {
+        this.world = world;
         ORIENTATION = orientation;
         this.w = w;
         this.h = h;
 
-        box = new CollisionBox(new Vector2(x, y), w, h, this);
-        world.addCollisionBox(box);
+        collisionBoxes = new ArrayList<>();
     }
 
     private int getDefaultWidth(Orientation orientation) {
@@ -94,7 +98,7 @@ public class Hallway extends Room {
 
     @Override
     public void setNorth(Room room) {
-        if (ORIENTATION == Orientation.VERTICAL)
+        if (ORIENTATION == Orientation.VERTICAL) {
             if (PARENT == null) PARENT = room;
             if (NORTH == room) return;
 
@@ -103,6 +107,16 @@ public class Hallway extends Room {
             NORTH = room;
 
             room.setSouth(this);
+
+            // Initialize the collisionBoxes list and add the collision boxes for the top wall
+            collisionBoxes = new ArrayList<>();
+            collisionBoxes.add(new CollisionBox(new Vector2(x - WALL_WIDTH, y), WALL_WIDTH, h, this));
+            collisionBoxes.add(new CollisionBox(new Vector2(x + w, y), WALL_WIDTH, h, this));
+
+            for (CollisionBox b : collisionBoxes) {
+                world.addCollisionBox(b);
+            }
+        }
     }
 
     @Override
@@ -112,7 +126,7 @@ public class Hallway extends Room {
 
     @Override
     public void setEast(Room room) {
-        if (ORIENTATION == Orientation.HORIZONTAL)
+        if (ORIENTATION == Orientation.HORIZONTAL) {
             if (PARENT == null) PARENT = room;
             if (EAST == room) return;
 
@@ -121,7 +135,19 @@ public class Hallway extends Room {
             EAST = room;
 
             room.setWest(this);
+
+            // Initialize the collisionBoxes list and add the collision boxes for the right wall
+            collisionBoxes = new ArrayList<>();
+            collisionBoxes.add(new CollisionBox(new Vector2(x, y - WALL_WIDTH), w, WALL_WIDTH, this)); // This one won't work
+            collisionBoxes.add(new CollisionBox(new Vector2(x, y + h - WALL_WIDTH), w, WALL_WIDTH, this));
+
+            for (CollisionBox b : collisionBoxes) {
+                System.out.println("Adding box " + b);
+                world.addCollisionBox(b);
+            }
+        }
     }
+
 
     @Override
     public Room getSouth() {
@@ -130,7 +156,7 @@ public class Hallway extends Room {
 
     @Override
     public void setSouth(Room room) {
-        if (ORIENTATION == Orientation.VERTICAL)
+        if (ORIENTATION == Orientation.VERTICAL) {
             if (PARENT == null) PARENT = room;
             if (SOUTH == room) return;
 
@@ -139,6 +165,16 @@ public class Hallway extends Room {
             SOUTH = room;
 
             room.setNorth(this);
+
+            // Initialize the collisionBoxes list and add the collision boxes for the bottom wall
+            collisionBoxes = new ArrayList<>();
+            collisionBoxes.add(new CollisionBox(new Vector2(x - WALL_WIDTH, y), WALL_WIDTH, h, this));
+            collisionBoxes.add(new CollisionBox(new Vector2(x + w, y), WALL_WIDTH, h, this));
+
+            for (CollisionBox b : collisionBoxes) {
+                world.addCollisionBox(b);
+            }
+        }
     }
 
     @Override
@@ -150,13 +186,19 @@ public class Hallway extends Room {
     public void setWest(Room room) {
         if (ORIENTATION == Orientation.HORIZONTAL)
             if (PARENT == null) PARENT = room;
-            if (WEST == room) return;
+        if (WEST == room) return;
 
-            room.setX(this.x - room.getWidth());
-            room.setY(this.y + this.h / 2 - room.getHeight() / 2);
-            WEST = room;
+        room.setX(this.x - room.getWidth());
+        room.setY(this.y + this.h / 2 - room.getHeight() / 2);
+        WEST = room;
 
-            room.setEast(this);
+        room.setEast(this);
+        collisionBoxes.add(new CollisionBox(new Vector2(x, y - WALL_WIDTH), w, WALL_WIDTH, this));
+        collisionBoxes.add(new CollisionBox(new Vector2(x, y + h - WALL_WIDTH), w, WALL_WIDTH, this));
+
+        for (CollisionBox b : collisionBoxes) {
+            world.addCollisionBox(b);
+        }
     }
 
     @Override
@@ -167,7 +209,9 @@ public class Hallway extends Room {
     @Override
     //public void draw(int x, int y, ShapeRenderer shape) {
     public void draw(ShapeRenderer shape) {
-        shape.rect(x, y, w, h);
+        for (CollisionBox b : collisionBoxes) {
+            shape.rect(b.getPosition().x, b.getPosition().y, b.getWidth(), b.getHeight());
+        }
     }
 
     @Override
@@ -203,18 +247,13 @@ public class Hallway extends Room {
     }
 
     @Override
-    public CollisionBox getBox() {
-        return box;
+    public Room getParent() {
+        return PARENT;
     }
 
     @Override
     public void setParent(Room room) {
         PARENT = room;
-    }
-
-    @Override
-    public Room getParent() {
-        return PARENT;
     }
 
     @Override

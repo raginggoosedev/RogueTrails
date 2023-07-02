@@ -1,12 +1,13 @@
 package com.raginggoose.roguetrails.room;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.raginggoose.roguetrails.collisions.CollisionBox;
 import com.raginggoose.roguetrails.collisions.CollisionWorld;
 import com.raginggoose.roguetrails.ecs.ECSEngine;
+
+import java.util.ArrayList;
 
 
 public class Cell extends Room {
@@ -16,6 +17,8 @@ public class Cell extends Room {
     private final int h;
     private final RoomType TYPE = RoomType.CELL;
     private final ECSEngine ecsEngine;
+    private final ArrayList<CollisionBox> collisionBoxes;
+    private final CollisionWorld world;
     public String name;
     private int x = 0;
     private int y = 0;
@@ -25,7 +28,6 @@ public class Cell extends Room {
     private Room SOUTH = null;
     private Room WEST = null;
     private Room PARENT = null;
-    private final CollisionBox box;
 
     //Constructor if no parameters given
     /* public Cell() {
@@ -38,8 +40,54 @@ public class Cell extends Room {
         this.w = w;
         this.h = h;
         this.ecsEngine = ecsEngine;
-        box = new CollisionBox(new Vector2(x, y), w, h, this);
-        world.addCollisionBox(box);
+        this.world = world;
+
+        collisionBoxes = new ArrayList<>();
+    }
+
+    public void createCollisionBoxes() {
+        int hallwayGap = 80; // Adjust the gap width as needed
+
+        // Calculate the position of the hallway gap for both width and height
+        int hallwayPositionX = (w - hallwayGap) / 2 + x;
+        int hallwayPositionY = (h - hallwayGap) / 2 + y;
+
+        // Create collision boxes for the top wall
+        if (NORTH != null) {
+            collisionBoxes.add(new CollisionBox(new Vector2(x, y + h), hallwayPositionX - x, 5, this)); // Left side wall
+            collisionBoxes.add(new CollisionBox(new Vector2(hallwayPositionX + hallwayGap, y + h), (x + w) - (hallwayPositionX + hallwayGap), 5, this)); // Right side wall
+        } else {
+            collisionBoxes.add(new CollisionBox(new Vector2(x, y + h - 1), w, 5, this)); // Full top wall
+        }
+
+        // Create collision boxes for the right wall
+        if (EAST != null) {
+            collisionBoxes.add(new CollisionBox(new Vector2(x + w - 1, y), 5, hallwayPositionY - y, this)); // Top side wall
+            collisionBoxes.add(new CollisionBox(new Vector2(x + w - 1, hallwayPositionY + hallwayGap), 5, (y + h) - (hallwayPositionY + hallwayGap), this)); // Bottom side wall
+        } else {
+            collisionBoxes.add(new CollisionBox(new Vector2(x + w - 1, y), 5, h, this)); // Full right wall
+        }
+
+        // Create collision boxes for the bottom wall
+        if (SOUTH != null) {
+            collisionBoxes.add(new CollisionBox(new Vector2(x, y - 1), hallwayPositionX - x, 5, this)); // Left side wall
+            collisionBoxes.add(new CollisionBox(new Vector2(hallwayPositionX + hallwayGap, y - 1), (x + w) - (hallwayPositionX + hallwayGap), 5, this)); // Right side wall
+        } else {
+            collisionBoxes.add(new CollisionBox(new Vector2(x, y), w, 5, this)); // Full bottom wall
+        }
+
+        // Create collision boxes for the left wall
+        if (WEST != null) {
+            collisionBoxes.add(new CollisionBox(new Vector2(x, y), 5, hallwayPositionY - y, this)); // Top side wall
+            collisionBoxes.add(new CollisionBox(new Vector2(x, hallwayPositionY + hallwayGap), 5, (y + h) - (hallwayPositionY + hallwayGap), this)); // Bottom side wall
+        } else {
+            collisionBoxes.add(new CollisionBox(new Vector2(x, y), 5, h, this)); // Full left wall
+        }
+
+        // Add the collision boxes to the collision world
+        for (CollisionBox box : collisionBoxes) {
+            world.addCollisionBox(box);
+        }
     }
 
 
@@ -60,11 +108,10 @@ public class Cell extends Room {
 
     @Override
     public void setNorth(Room room) {
-//        room.moveX(this.w/2 - room.getWidth()/2);
-//        room.moveY(room.getHeight());
         if (PARENT == null) PARENT = room;
         if (NORTH == room) return;
-        room.setX(this.x + this.w / 2 - room.getWidth() / 2);
+
+        room.setX(this.x + (this.w - room.getWidth()) / 2);
         room.setY(this.y + this.h);
         NORTH = room;
         addEnemies();
@@ -83,7 +130,7 @@ public class Cell extends Room {
         if (EAST == room) return;
 
         room.setX(this.x + this.w);
-        room.setY(this.y + this.h / 2 - room.getHeight() / 2);
+        room.setY(this.y + (this.h - room.getHeight()) / 2);
         EAST = room;
         addEnemies();
 
@@ -97,12 +144,10 @@ public class Cell extends Room {
 
     @Override
     public void setSouth(Room room) {
-//        room.moveX(this.w/2-room.getWidth()/2);
-//        room.moveY(this.h);
         if (PARENT == null) PARENT = room;
         if (SOUTH == room) return;
 
-        room.setX(this.x + this.w / 2 - room.getWidth() / 2);
+        room.setX(this.x + (this.w - room.getWidth()) / 2);
         room.setY(this.y - room.getHeight());
         SOUTH = room;
         addEnemies();
@@ -118,13 +163,11 @@ public class Cell extends Room {
 
     @Override
     public void setWest(Room room) {
-//        room.moveX(-room.getWidth());
-//        room.moveY(-this.w/2 + room.getHeight()/2);
         if (PARENT == null) PARENT = room;
         if (WEST == room) return;
 
         room.setX(this.x - room.getWidth());
-        room.setY(this.y + this.h / 2 - room.getHeight() / 2);
+        room.setY(this.y + (this.h - room.getHeight()) / 2);
         WEST = room;
         addEnemies();
 
@@ -134,6 +177,11 @@ public class Cell extends Room {
     @Override
     public Room getParent() {
         return PARENT;
+    }
+
+    @Override
+    public void setParent(Room room) {
+        PARENT = room;
     }
 
     public void addEnemies() {
@@ -154,7 +202,9 @@ public class Cell extends Room {
 
     //public void draw(int x, int y, ShapeRenderer shape) {
     public void draw(ShapeRenderer shape) {
-        shape.rect(x, y, w, h);
+        for (CollisionBox b : collisionBoxes) {
+            shape.rect(b.getPosition().x, b.getPosition().y, b.getWidth(), b.getHeight());
+        }
     }
 
     @Override
@@ -187,15 +237,6 @@ public class Cell extends Room {
 
     public String getName() {
         return name;
-    }
-
-    public CollisionBox getBox() {
-        return box;
-    }
-
-    @Override
-    public void setParent(Room room) {
-        PARENT = room;
     }
 
     @Override

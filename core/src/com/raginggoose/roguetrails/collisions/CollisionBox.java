@@ -2,6 +2,7 @@ package com.raginggoose.roguetrails.collisions;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
+import com.raginggoose.roguetrails.room.Direction;
 import com.raginggoose.roguetrails.room.Room;
 
 /**
@@ -14,6 +15,7 @@ public class CollisionBox {
     private final Room room;
     private boolean isStatic;
     private boolean hasCollided = false;
+    private Direction collisionDirection;
 
     /**
      * Constructor for static world collision boxes
@@ -81,5 +83,21 @@ public class CollisionBox {
 
     public void updatePosition(Vector2 pos) {
         this.pos.set(pos);
+    }
+
+    public float getCenterX() {
+        return pos.x + (w / 2);
+    }
+
+    public float getCenterY() {
+        return pos.y + (h / 2);
+    }
+
+    public void setCollisionDirection(Direction dir) {
+        collisionDirection = dir;
+    }
+
+    public Direction getCollisionDirection() {
+        return collisionDirection;
     }
 }
