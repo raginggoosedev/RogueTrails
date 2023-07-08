@@ -7,14 +7,18 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.audio.AudioType;
-import com.raginggoose.roguetrails.collisions.CollisionWorld;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.ECSEngine;
 import com.raginggoose.roguetrails.ecs.Mapper;
@@ -32,11 +36,14 @@ import com.raginggoose.roguetrails.room.Hallway;
 import com.raginggoose.roguetrails.room.Orientation;
 import com.raginggoose.roguetrails.room.Room;
 
+import static com.raginggoose.roguetrails.Constants.PPM;
+
 public class GameScreen implements Screen {
     private final RogueTrails game;
     private final SpriteBatch batch;
     private final ECSEngine ecsEngine;
     private final AssetManager assetManager;
+    private final World world;
     private final AssetLoader assetLoader;
     private final ShapeRenderer shape;
     private final OrthographicCamera cam;
@@ -44,11 +51,12 @@ public class GameScreen implements Screen {
     private final Skin skin;
     private final Stage stage;
     private final Inventory inventory;
-    private final CollisionWorld world;
     private final PlayerComponent playerComponent;
     private final Menu menu;
     public Dungeon dun;
     private boolean paused;
+    private final Box2DDebugRenderer debugRenderer;
+    private final ExtendViewport viewport;
 
     /**
      * Create a new game screen to display and play the game
@@ -56,7 +64,7 @@ public class GameScreen implements Screen {
      * @param game the parent game class
      */
     public GameScreen(RogueTrails game) {
-
+        Box2D.init();
         this.game = game;
         this.batch = game.getBatch();
         assetManager = game.getAssetManager().manager;
@@ -67,17 +75,19 @@ public class GameScreen implements Screen {
             game.getAudioManager().playAudio(AudioType.BACKGROUND);
 
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);
 
-        world = new CollisionWorld();
+        viewport = new ExtendViewport(16, 9, cam);
+
+        // Create new Box2D world with no gravity
+        world = new World(Vector2.Zero, true);
 
 
-        ecsEngine = new ECSEngine(shape, batch, cam, world, assetLoader);
-        ecsEngine.createPlayer(10, 10, 32, 32, 0);
-
+        debugRenderer = new Box2DDebugRenderer();
+        ecsEngine = new ECSEngine(shape, debugRenderer, batch, cam, assetLoader, world);
+        ecsEngine.createPlayer(32, 32, 32, 32, 0);
 
         dun = makeDungeon();
-        dun.createCollisionBoxes();
 
         spawnItems(dun.getStart(), 200, 100);
 
@@ -95,6 +105,7 @@ public class GameScreen implements Screen {
         menu = new Menu(stage, skin, game);
 
         paused = false;
+
     }
 
     @Override
@@ -109,13 +120,13 @@ public class GameScreen implements Screen {
 
     public Dungeon makeDungeon() {
         Cell start = new Cell(300, 300, ecsEngine, world);
-        Hallway hall1 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
+        Hallway hall1 = new Hallway(300, 80, Orientation.HORIZONTAL);
         Cell cellA = new Cell(300, 300, ecsEngine, world);
-        Hallway hall2 = new Hallway(80, 300, Orientation.VERTICAL, world);
-        Hallway hall3 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
+        Hallway hall2 = new Hallway(80, 300, Orientation.VERTICAL);
+        Hallway hall3 = new Hallway(300, 80, Orientation.HORIZONTAL);
         Cell cellB = new Cell(300, 300, ecsEngine, world);
         Cell cellD = new Cell(100, 100, ecsEngine, world);
-        Hallway hall4 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
+        Hallway hall4 = new Hallway(300, 80, Orientation.HORIZONTAL);
         Cell cellC = new Cell(1000, 1000, ecsEngine, world);
         Cell cellE = new Cell(80, 80, ecsEngine, world);
 
@@ -131,7 +142,9 @@ public class GameScreen implements Screen {
         hall4.setWest(cellB);
         cellB.setSouth(cellD);
 
-        world.setDungeon(dungeon);
+
+        dungeon.createCollisionBoxes();
+
         return dungeon;
 
     }
@@ -149,6 +162,7 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.2f, 0.75f, 0.5f, 1);
+        viewport.apply(false);
 
         if (!paused) {
             // Game is not paused, logic and rendering should be done
@@ -170,8 +184,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        cam.setToOrtho(false, width, height);
-        cam.update();
+        viewport.update(width, height, false);
         stage.getViewport().update(width, height, true);
         hud.resize(width, height);
     }
@@ -197,6 +210,8 @@ public class GameScreen implements Screen {
     public void dispose() {
         shape.dispose();
         stage.dispose();
+        world.dispose();
+        debugRenderer.dispose();
     }
 
     private void processInput() {
@@ -207,7 +222,6 @@ public class GameScreen implements Screen {
 
     private void updateGameLogic(float delta) {
         // Update entities and the physics world
-        world.update();
         ecsEngine.update(delta);
     }
 
