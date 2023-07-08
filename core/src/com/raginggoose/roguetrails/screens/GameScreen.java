@@ -77,7 +77,7 @@ public class GameScreen implements Screen {
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);
 
-        viewport = new ExtendViewport(16, 9, cam);
+        viewport = new ExtendViewport(16 * 4, 9 * 4, cam);
 
         // Create new Box2D world with no gravity
         world = new World(Vector2.Zero, true);
@@ -120,13 +120,13 @@ public class GameScreen implements Screen {
 
     public Dungeon makeDungeon() {
         Cell start = new Cell(300, 300, ecsEngine, world);
-        Hallway hall1 = new Hallway(300, 80, Orientation.HORIZONTAL);
+        Hallway hall1 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
         Cell cellA = new Cell(300, 300, ecsEngine, world);
-        Hallway hall2 = new Hallway(80, 300, Orientation.VERTICAL);
-        Hallway hall3 = new Hallway(300, 80, Orientation.HORIZONTAL);
+        Hallway hall2 = new Hallway(80, 300, Orientation.VERTICAL, world);
+        Hallway hall3 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
         Cell cellB = new Cell(300, 300, ecsEngine, world);
         Cell cellD = new Cell(100, 100, ecsEngine, world);
-        Hallway hall4 = new Hallway(300, 80, Orientation.HORIZONTAL);
+        Hallway hall4 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
         Cell cellC = new Cell(1000, 1000, ecsEngine, world);
         Cell cellE = new Cell(80, 80, ecsEngine, world);
 
@@ -165,6 +165,9 @@ public class GameScreen implements Screen {
         viewport.apply(false);
 
         if (!paused) {
+            if (Gdx.input.isKeyPressed(Input.Keys.TAB))
+                dun.addEnemies();
+
             // Game is not paused, logic and rendering should be done
             processInput();
             updateGameLogic(delta);

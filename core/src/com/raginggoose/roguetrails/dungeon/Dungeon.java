@@ -1,7 +1,7 @@
 package com.raginggoose.roguetrails.dungeon;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.raginggoose.roguetrails.collisions.CollisionWorld;
+import com.badlogic.gdx.physics.box2d.World;
 import com.raginggoose.roguetrails.room.Cell;
 import com.raginggoose.roguetrails.room.Room;
 
@@ -18,23 +18,23 @@ public class Dungeon implements Cloneable {
     private int y;
 
     //Constructor without position
-    public Dungeon(Room start, Room end, CollisionWorld world) {
+    public Dungeon(Room start, Room end, World world) {
         START = start;
         END = null; //TODO: make this not null
         x = 0;
         y = 0;
 
-        start.setParent(new Cell(0,0,null, world)); //this is important no touch
+        start.setParent(new Cell(0, 0, null, world)); //this is important no touch
     }
 
     //Constructor with position
-    public Dungeon(Room start, Room end, int x, int y, CollisionWorld world) {
+    public Dungeon(Room start, Room end, int x, int y, World world) {
         START = start;
         END = null; //TODO: make this not null
         this.x = x;
         this.y = y;
 
-        start.setParent(new Cell(0,0,null, world)); //this is important no touch
+        start.setParent(new Cell(0, 0, null, world)); //this is important no touch
     }
 
     public Room getStart() {
@@ -110,7 +110,7 @@ public class Dungeon implements Cloneable {
         putIntoArray(START, roomList);
 
         for (Room r : roomList) {
-            if (inRoom(x, y, r))  {
+            if (inRoom(x, y, r)) {
                 return r;
             }
         }
@@ -155,8 +155,17 @@ public class Dungeon implements Cloneable {
         putIntoArray(START, rooms);
 
         for (Room r : rooms) {
+            r.createCollisionBoxes();
+        }
+    }
+
+    public void addEnemies() {
+        ArrayList<Room> rooms = new ArrayList<>();
+        putIntoArray(START, rooms);
+
+        for (Room r : rooms) {
             if (r instanceof Cell) {
-                ((Cell) r).createCollisionBoxes();
+                ((Cell) r).addEnemies();
             }
         }
     }

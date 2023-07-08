@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.CollisionComponent;
@@ -32,6 +33,7 @@ public class EnemyMovementSystem extends IteratingSystem {
 
         Vector3 enemyPos = transformComponent.position;
         Vector3 playerPos = playerTransformComponent.position;
+        Vector2 force = new Vector2(0, 0);
 
         float speed = enemyComponent.speed;
 
@@ -45,26 +47,10 @@ public class EnemyMovementSystem extends IteratingSystem {
         CollisionComponent collisionComponent = Mapper.COLLISION_MAPPER.get(entity);
 
         if (!collisionComponent.collided) {
-            if (diffX < -1 || diffX > 1) enemyPos.add(speed * MathUtils.cos(angle), 0, 0);
-            if (diffY < -1 || diffY > 1) enemyPos.add(0, speed * MathUtils.sin(angle), 0);
-        } else {
-            Direction collisionDirection = collisionComponent.collisionBox.getCollisionDirection();
-            float overlapX = collisionComponent.collisionOverlapX;
-            float overlapY = collisionComponent.collisionOverlapY;
-
-            // Adjust position based on collision direction
-            if (collisionDirection.equals(Direction.RIGHT))
-                enemyPos.add(overlapX + 2, 0, 0);
-            else if (collisionDirection.equals(Direction.LEFT))
-                enemyPos.add(-(overlapX + 2), 0, 0);
-            else if (collisionDirection.equals(Direction.UP))
-                enemyPos.add(0, overlapY + 2, 0);
-            else if (collisionDirection.equals(Direction.DOWN))
-                enemyPos.add(0, -(overlapY + 2), 0);
-
-            collisionComponent.collided = false;
-            collisionComponent.box.setCollision(false);
-            collisionComponent.collisionBox = null;
+            if (diffX < -1 || diffX > 1) force.x = speed * MathUtils.cos(angle);
+            if (diffY < -1 || diffY > 1) force.y = speed * MathUtils.sin(angle);
         }
+
+        collisionComponent.body.setLinearVelocity(force.x, force.y);
     }
 }

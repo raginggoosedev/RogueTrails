@@ -10,9 +10,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.raginggoose.roguetrails.RogueTrails;
-import com.raginggoose.roguetrails.collisions.CollisionBox;
-import com.raginggoose.roguetrails.collisions.CollisionWorld;
+import com.raginggoose.roguetrails.b2d.BodyFactory;
 import com.raginggoose.roguetrails.ecs.components.*;
 import com.raginggoose.roguetrails.ecs.systems.*;
 import com.raginggoose.roguetrails.inventory.Inventory;
@@ -23,19 +25,19 @@ import com.raginggoose.roguetrails.loader.AssetLoader;
  */
 public class ECSEngine extends PooledEngine {
     public final static String TAG = ECSEngine.class.getSimpleName();
-    private final CollisionWorld world;
+    private final World world;
     public static final Color ENEMY_DEBUG_COLOUR = Color.RED;
     public static final Color PLAYER_DEBUG_COLOUR = Color.BLUE;
     public static final Color ITEM_DEBUG_COLOUR = Color.GREEN;
     private final Entity player;
     private final AssetLoader assetLoader;
 
-    public ECSEngine(ShapeRenderer s, SpriteBatch batch, OrthographicCamera cam, CollisionWorld world, AssetLoader assetLoader) {
+    public ECSEngine(ShapeRenderer s, Box2DDebugRenderer debug, SpriteBatch batch, OrthographicCamera cam, AssetLoader assetLoader, World world) {
         this.world = world;
         this.assetLoader = assetLoader;
 
         if (RogueTrails.DEBUG)
-            this.addSystem(new DebugRenderingSystem(s));
+            this.addSystem(new DebugRenderingSystem(s, debug, world, cam));
 
         this.addSystem(new PlayerCameraSystem(cam));
 
@@ -46,6 +48,8 @@ public class ECSEngine extends PooledEngine {
         this.addSystem(new CollisionSystem());
 
         this.addSystem(new AnimationSystem());
+
+        this.addSystem(new PhysicsSystem(world));
 
         player = this.createEntity();
         this.addSystem(new InteractionSystem(player));
@@ -68,7 +72,7 @@ public class ECSEngine extends PooledEngine {
 
         // Player Component
         PlayerComponent playerComponent = this.createComponent(PlayerComponent.class);
-        playerComponent.speed = 2.0f;
+        playerComponent.speed = 4.0f;
         playerComponent.health = 3.0f;
         playerComponent.inventory = new Inventory();
         player.add(playerComponent);
@@ -114,8 +118,9 @@ public class ECSEngine extends PooledEngine {
 
         // Collision Component
         CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
-        collisionComponent.box = new CollisionBox(transformComponent.prevPosition, transformComponent.width, transformComponent.height, player);
-        world.addCollisionBox(collisionComponent.box);
+
+        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.DynamicBody, false);
+        collisionComponent.body.setUserData(player);
         player.add(collisionComponent);
 
         // Debug Component
@@ -171,8 +176,11 @@ public class ECSEngine extends PooledEngine {
 
         // Collision Component
         CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
-        collisionComponent.box = new CollisionBox(transformComponent.prevPosition, transformComponent.width, transformComponent.height, enemy);
-        world.addCollisionBox(collisionComponent.box);
+
+        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.DynamicBody, false);
+        collisionComponent.body.setUserData(enemy);
+        enemy.add(collisionComponent);
+
         enemy.add(collisionComponent);
 
         // Debug Component
@@ -203,6 +211,12 @@ public class ECSEngine extends PooledEngine {
         itemComponent.collected = false;
         item.add(itemComponent);
         sBuild.append("Item Type: ").append(itemComponent).append("\n");
+
+        // Collision Component
+        CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
+        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.StaticBody, true);
+        collisionComponent.body.setUserData(item);
+        item.add(collisionComponent);
 
         // Transform Component
         TransformComponent transformComponent = this.createComponent(TransformComponent.class);
