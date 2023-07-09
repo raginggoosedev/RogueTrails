@@ -7,14 +7,19 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.audio.AudioType;
-import com.raginggoose.roguetrails.collisions.CollisionWorld;
+import com.raginggoose.roguetrails.b2d.WorldContactListener;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.ECSEngine;
 import com.raginggoose.roguetrails.ecs.Mapper;
@@ -32,11 +37,15 @@ import com.raginggoose.roguetrails.room.Hallway;
 import com.raginggoose.roguetrails.room.Orientation;
 import com.raginggoose.roguetrails.room.Room;
 
+import static com.raginggoose.roguetrails.Constants.PPM;
+
 public class GameScreen implements Screen {
     private final RogueTrails game;
     private final SpriteBatch batch;
     private final ECSEngine ecsEngine;
     private final AssetManager assetManager;
+    private final World world;
+    private final WorldContactListener worldContactListener;
     private final AssetLoader assetLoader;
     private final ShapeRenderer shape;
     private final OrthographicCamera cam;
@@ -44,11 +53,12 @@ public class GameScreen implements Screen {
     private final Skin skin;
     private final Stage stage;
     private final Inventory inventory;
-    private final CollisionWorld world;
     private final PlayerComponent playerComponent;
     private final Menu menu;
     public Dungeon dun;
     private boolean paused;
+    private final Box2DDebugRenderer debugRenderer;
+    private final ExtendViewport viewport;
 
     /**
      * Create a new game screen to display and play the game
@@ -56,7 +66,7 @@ public class GameScreen implements Screen {
      * @param game the parent game class
      */
     public GameScreen(RogueTrails game) {
-
+        Box2D.init();
         this.game = game;
         this.batch = game.getBatch();
         assetManager = game.getAssetManager().manager;
@@ -67,17 +77,21 @@ public class GameScreen implements Screen {
             game.getAudioManager().playAudio(AudioType.BACKGROUND);
 
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);
 
-        world = new CollisionWorld();
+        viewport = new ExtendViewport(16 * 4, 9 * 4, cam);
+
+        // Create new Box2D world with no gravity
+        world = new World(Vector2.Zero, true);
+        worldContactListener = new WorldContactListener();
+        world.setContactListener(worldContactListener);
 
 
-        ecsEngine = new ECSEngine(shape, batch, cam, world, assetLoader);
-        ecsEngine.createPlayer(10, 10, 32, 32, 0);
-
+        debugRenderer = new Box2DDebugRenderer();
+        ecsEngine = new ECSEngine(shape, debugRenderer, batch, cam, assetLoader, world);
+        ecsEngine.createPlayer(32, 32, 32, 32, 0);
 
         dun = makeDungeon();
-        dun.updateBoxes();
 
         spawnItems(dun.getStart(), 200, 100);
 
@@ -95,6 +109,7 @@ public class GameScreen implements Screen {
         menu = new Menu(stage, skin, game);
 
         paused = false;
+
     }
 
     @Override
@@ -119,7 +134,7 @@ public class GameScreen implements Screen {
         Cell cellC = new Cell(1000, 1000, ecsEngine, world);
         Cell cellE = new Cell(80, 80, ecsEngine, world);
 
-        Dungeon dungeon = new Dungeon(start, null);
+        Dungeon dungeon = new Dungeon(start, null, world);
 
         start.setEast(hall1);
         hall1.setEast(cellA);
@@ -131,7 +146,9 @@ public class GameScreen implements Screen {
         hall4.setWest(cellB);
         cellB.setSouth(cellD);
 
-        world.setDungeon(dungeon);
+
+        dungeon.createCollisionBoxes();
+
         return dungeon;
 
     }
@@ -149,51 +166,34 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.2f, 0.75f, 0.5f, 1);
+        viewport.apply(false);
 
         if (!paused) {
-            if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
-                pause();
+            if (Gdx.input.isKeyPressed(Input.Keys.TAB))
+                dun.addEnemies();
 
-            // Draw a small rectangle
-            shape.setProjectionMatrix(cam.combined);
-            shape.begin(ShapeRenderer.ShapeType.Line);
-            assetLoader.queueAssets();
-
-            dun.draw(shape);
-
-            shape.end();
-
-            batch.setProjectionMatrix(cam.combined);
-            //TODO add collision system to ecs
-            ecsEngine.update(delta);
-            world.update();
+            // Game is not paused, logic and rendering should be done
+            processInput();
+            updateGameLogic(delta);
+            drawGame();
 
             hud.updateInventory(inventory);
             hud.updateHealth(playerComponent.health);
         } else {
-
-            assetLoader.queueAssets();
-            batch.setProjectionMatrix(cam.combined);
-
-            // Only update drawing/rendering
-            ecsEngine.getSystem(RenderingSystem.class).update(delta);
-
-            if (RogueTrails.DEBUG)
-                ecsEngine.getSystem(DebugRenderingSystem.class).update(delta);
-
-            // Draw a small rectangle
-            shape.setProjectionMatrix(cam.combined);
-            shape.begin(ShapeRenderer.ShapeType.Line);
-            dun.draw(shape);
-            shape.end();
+            // Game is paused, only rendering should be done
+            drawPausedGame(delta);
         }
+
+        // Stage is drawn regardless
         stage.draw();
         stage.act(delta);
     }
 
     @Override
     public void resize(int width, int height) {
-
+        viewport.update(width, height, false);
+        stage.getViewport().update(width, height, true);
+        hud.resize(width, height);
     }
 
     @Override
@@ -217,5 +217,54 @@ public class GameScreen implements Screen {
     public void dispose() {
         shape.dispose();
         stage.dispose();
+        world.dispose();
+        debugRenderer.dispose();
+    }
+
+    private void processInput() {
+        // If escape is pressed, the game is paused
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
+            pause();
+    }
+
+    private void updateGameLogic(float delta) {
+        // Update entities and the physics world
+        ecsEngine.update(delta);
+        world.step(1/60f, 6, 2);
+    }
+
+    private void drawGame() {
+        // Draw a small rectangle
+        shape.setProjectionMatrix(cam.combined);
+        shape.begin(ShapeRenderer.ShapeType.Line);
+        assetLoader.queueAssets();
+
+        dun.draw(shape);
+
+        shape.end();
+
+        // Set up projection matrix for rendering system
+        batch.setProjectionMatrix(cam.combined);
+    }
+
+    /**
+     * A method to continue rendering the game while it is paused
+     * @param delta Time between the previous and current call to render()
+     */
+    private void drawPausedGame(float delta) {
+        batch.setProjectionMatrix(cam.combined);
+
+        // Only use the render system so that the game is still rendered
+        ecsEngine.getSystem(RenderingSystem.class).update(delta);
+
+        if (RogueTrails.DEBUG) {
+            // Show debug rendering if the game is run in debug mode
+            ecsEngine.getSystem(DebugRenderingSystem.class).update(delta);
+        }
+
+        shape.setProjectionMatrix(cam.combined);
+        shape.begin(ShapeRenderer.ShapeType.Line);
+        dun.draw(shape);
+        shape.end();
     }
 }

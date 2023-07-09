@@ -12,6 +12,7 @@ public class TransformComponent implements Component, Pool.Poolable {
     public float width = 0.0f;
     public float height = 0.0f;
     public float rotation = 0.0f;
+    public boolean hitWall = false;
 
     @Override
     public void reset() {
@@ -20,5 +21,6 @@ public class TransformComponent implements Component, Pool.Poolable {
         position.set(0.0f, 0.0f, 0.0f);
         prevPosition.set(0.0f, 0.0f);
         width = height = 0.0f;
+        hitWall = false;
     }
 }

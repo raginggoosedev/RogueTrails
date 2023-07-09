@@ -5,8 +5,10 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.raginggoose.roguetrails.ecs.Mapper;
+import com.raginggoose.roguetrails.ecs.components.CollisionComponent;
 import com.raginggoose.roguetrails.ecs.components.EnemyComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
 import com.raginggoose.roguetrails.room.Direction;
@@ -31,6 +33,7 @@ public class EnemyMovementSystem extends IteratingSystem {
 
         Vector3 enemyPos = transformComponent.position;
         Vector3 playerPos = playerTransformComponent.position;
+        Vector2 force = new Vector2(0, 0);
 
         float speed = enemyComponent.speed;
 
@@ -41,7 +44,13 @@ public class EnemyMovementSystem extends IteratingSystem {
         // Find the angle of the difference x and y
         float angle = MathUtils.atan2(diffY, diffX);
 
-        if (diffX < -1 || diffX > 1) enemyPos.add(speed * MathUtils.cos(angle), 0, 0);
-        if (diffY < -1 || diffY > 1) enemyPos.add(0, speed * MathUtils.sin(angle), 0);
+        CollisionComponent collisionComponent = Mapper.COLLISION_MAPPER.get(entity);
+
+        if (!collisionComponent.collided) {
+            if (diffX < -1 || diffX > 1) force.x = speed * MathUtils.cos(angle);
+            if (diffY < -1 || diffY > 1) force.y = speed * MathUtils.sin(angle);
+        }
+
+        collisionComponent.body.setLinearVelocity(force.x, force.y);
     }
 }

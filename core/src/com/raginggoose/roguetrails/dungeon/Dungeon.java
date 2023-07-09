@@ -1,9 +1,7 @@
 package com.raginggoose.roguetrails.dungeon;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
-import com.raginggoose.roguetrails.collisions.CollisionWorld;
-import com.raginggoose.roguetrails.ecs.ECSEngine;
+import com.badlogic.gdx.physics.box2d.World;
 import com.raginggoose.roguetrails.room.Cell;
 import com.raginggoose.roguetrails.room.Room;
 
@@ -20,23 +18,23 @@ public class Dungeon implements Cloneable {
     private int y;
 
     //Constructor without position
-    public Dungeon(Room start, Room end) {
+    public Dungeon(Room start, Room end, World world) {
         START = start;
         END = null; //TODO: make this not null
         x = 0;
         y = 0;
 
-        start.setParent(new Cell(0,0,null, new CollisionWorld())); //this is important no touch
+        start.setParent(new Cell(0, 0, null, world)); //this is important no touch
     }
 
     //Constructor with position
-    public Dungeon(Room start, Room end, int x, int y) {
+    public Dungeon(Room start, Room end, int x, int y, World world) {
         START = start;
         END = null; //TODO: make this not null
         this.x = x;
         this.y = y;
 
-        start.setParent(new Cell(0,0,null, new CollisionWorld())); //this is important no touch
+        start.setParent(new Cell(0, 0, null, world)); //this is important no touch
     }
 
     public Room getStart() {
@@ -112,7 +110,7 @@ public class Dungeon implements Cloneable {
         putIntoArray(START, roomList);
 
         for (Room r : roomList) {
-            if (inRoom(x, y, r))  {
+            if (inRoom(x, y, r)) {
                 return r;
             }
         }
@@ -152,12 +150,23 @@ public class Dungeon implements Cloneable {
         return (playerX >= x1 && playerX <= x2 && playerY >= y1 && playerY <= y2);
     }
 
-    public void updateBoxes() {
-        ArrayList<Room> roomList = new ArrayList<>();
-        putIntoArray(START, roomList);
+    public void createCollisionBoxes() {
+        ArrayList<Room> rooms = new ArrayList<>();
+        putIntoArray(START, rooms);
 
-        for (Room r : roomList) {
-            r.getBox().updatePosition(new Vector2(r.getX(), r.getY()));
+        for (Room r : rooms) {
+            r.createCollisionBoxes();
+        }
+    }
+
+    public void addEnemies() {
+        ArrayList<Room> rooms = new ArrayList<>();
+        putIntoArray(START, rooms);
+
+        for (Room r : rooms) {
+            if (r instanceof Cell) {
+                ((Cell) r).addEnemies();
+            }
         }
     }
 }

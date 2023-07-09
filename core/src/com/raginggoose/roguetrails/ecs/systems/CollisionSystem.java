@@ -6,7 +6,6 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.CollisionComponent;
-import com.raginggoose.roguetrails.ecs.components.EnemyComponent;
 import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
 
@@ -20,33 +19,19 @@ public class CollisionSystem extends IteratingSystem {
     }
 
     @Override
-    protected void processEntity(Entity entity, float v) {
-        TransformComponent transformComp = Mapper.TRANSFORM_MAPPER.get(entity);
+    protected void processEntity(Entity entity, float delta) {
         CollisionComponent collComp = Mapper.COLLISION_MAPPER.get(entity);
 
-        // Update entity's collision box position
-        Vector2 pos = new Vector2(transformComp.position.x, transformComp.position.y);
-        collComp.box.updatePosition(pos);
-
         PlayerComponent playerComp = Mapper.PLAYER_MAPPER.get(entity);
-        if (playerComp != null) {
-            // Handle player entity's collisions
-            if (collComp.collided && collComp.collisionBox.getEntity() != null) {
-                if (Mapper.ENEMY_MAPPER.get(collComp.collisionBox.getEntity()) != null) {
-                    // Get enemy information from collided entity
-                    EnemyComponent enemyComp = Mapper.ENEMY_MAPPER.get(collComp.collisionBox.getEntity());
-                    playerComp.health -= enemyComp.damage;
+        if (playerComp != null && collComp.collisionBody != null) {
+            if (collComp.collisionBody.getUserData() instanceof Entity) {
+                System.out.println("Wow");
+                if (Mapper.ENEMY_MAPPER.get((Entity) collComp.collisionBody.getUserData()) != null) {
+                    collComp.pushStrength = 10.0f;
+                    playerComp.health -= Mapper.ENEMY_MAPPER.get((Entity) collComp.collisionBody.getUserData()).damage;
+                    System.out.println(collComp.pushStrength);
                 }
-            } else if (collComp.collided) {
-                // Player collided with static boundary
-                System.out.println("HIT A WALL!");
-
             }
         }
-
-        // Reset the entity's collision component
-        collComp.collided = false;
-        collComp.box.setCollision(false);
-        collComp.collisionBox = null;
     }
 }

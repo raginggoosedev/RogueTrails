@@ -10,7 +10,10 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.raginggoose.roguetrails.audio.AudioManager;
 import com.raginggoose.roguetrails.loader.AssetLoader;
+import com.raginggoose.roguetrails.screens.GameScreen;
+import com.raginggoose.roguetrails.screens.MenuScreen;
 import com.raginggoose.roguetrails.screens.ScreenType;
+import com.raginggoose.roguetrails.screens.SettingsScreen;
 
 import java.util.EnumMap;
 
@@ -72,28 +75,29 @@ public class RogueTrails extends Game {
     public void setScreen(ScreenType screenType) {
         prevScreen = screen;
 
-        screen = getScreen();
-
         Screen screen = screenCache.get(screenType);
 
         if (screen == null) {
             // Screen doesn't exist yet, create a new screen
             Gdx.app.log(TAG, "Creating " + screenType + " screen");
-            try {
-                // Try to create the new screen and add it to the cache
-                Screen newScreen = (Screen) ClassReflection.getConstructor(screenType.getScreenClass(), RogueTrails.class).newInstance(this);
-                screenCache.put(screenType, newScreen);
-
-                setScreen(newScreen);
-            } catch (ReflectionException e) {
-                throw new GdxRuntimeException("Screen " + screenType + " could not be created!", e);
-            }
-        } else {
-            // Screen exists
-            setScreen(screen);
+            screen = createScreen(screenType);
+            screenCache.put(screenType, screen);
         }
 
+        setScreen(screen);
+    }
 
+    private Screen createScreen(ScreenType screenType) {
+        switch (screenType) {
+            case MENU:
+                return new MenuScreen(this);
+            case GAME:
+                return new GameScreen(this);
+            case SETTINGS:
+                return new SettingsScreen(this);
+            default:
+                throw new IllegalArgumentException("Unsupported screen type: " + screenType);
+        }
     }
 
     // Public getters
