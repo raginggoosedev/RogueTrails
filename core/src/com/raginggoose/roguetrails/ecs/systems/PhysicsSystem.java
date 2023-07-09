@@ -12,12 +12,10 @@ import com.raginggoose.roguetrails.ecs.components.CollisionComponent;
 import com.raginggoose.roguetrails.ecs.components.TransformComponent;
 
 public class PhysicsSystem extends IteratingSystem {
-    private final World world;
     private final Array<Entity> bodyQueue;
 
     public PhysicsSystem(World world) {
         super(Family.all(CollisionComponent.class).get());
-        this.world = world;
         bodyQueue = new Array<>();
     }
 
@@ -30,7 +28,6 @@ public class PhysicsSystem extends IteratingSystem {
     @Override
     public void update(float delta) {
         super.update(delta);
-        world.step(1/60f, 6, 2);
 
         // Iterate through all bodies
         for (Entity entity : new Array.ArrayIterator<>(bodyQueue)) {

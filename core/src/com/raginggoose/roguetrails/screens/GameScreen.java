@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.audio.AudioType;
+import com.raginggoose.roguetrails.b2d.WorldContactListener;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.ECSEngine;
 import com.raginggoose.roguetrails.ecs.Mapper;
@@ -44,6 +45,7 @@ public class GameScreen implements Screen {
     private final ECSEngine ecsEngine;
     private final AssetManager assetManager;
     private final World world;
+    private final WorldContactListener worldContactListener;
     private final AssetLoader assetLoader;
     private final ShapeRenderer shape;
     private final OrthographicCamera cam;
@@ -81,6 +83,8 @@ public class GameScreen implements Screen {
 
         // Create new Box2D world with no gravity
         world = new World(Vector2.Zero, true);
+        worldContactListener = new WorldContactListener();
+        world.setContactListener(worldContactListener);
 
 
         debugRenderer = new Box2DDebugRenderer();
@@ -226,6 +230,7 @@ public class GameScreen implements Screen {
     private void updateGameLogic(float delta) {
         // Update entities and the physics world
         ecsEngine.update(delta);
+        world.step(1/60f, 6, 2);
     }
 
     private void drawGame() {

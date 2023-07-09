@@ -29,6 +29,7 @@ public class ECSEngine extends PooledEngine {
     public static final Color ENEMY_DEBUG_COLOUR = Color.RED;
     public static final Color PLAYER_DEBUG_COLOUR = Color.BLUE;
     public static final Color ITEM_DEBUG_COLOUR = Color.GREEN;
+
     private final Entity player;
     private final AssetLoader assetLoader;
 
@@ -119,8 +120,7 @@ public class ECSEngine extends PooledEngine {
         // Collision Component
         CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
 
-        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.DynamicBody, false);
-        collisionComponent.body.setUserData(player);
+        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.DynamicBody, false, player, BodyFactory.PLAYER_BITS, (short) (BodyFactory.ENEMY_BITS | BodyFactory.ITEM_BITS | BodyFactory.STATIC_BITS));
         player.add(collisionComponent);
 
         // Debug Component
@@ -177,10 +177,7 @@ public class ECSEngine extends PooledEngine {
         // Collision Component
         CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
 
-        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.DynamicBody, false);
-        collisionComponent.body.setUserData(enemy);
-        enemy.add(collisionComponent);
-
+        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.DynamicBody, false, enemy, BodyFactory.ENEMY_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.STATIC_BITS));
         enemy.add(collisionComponent);
 
         // Debug Component
@@ -214,8 +211,7 @@ public class ECSEngine extends PooledEngine {
 
         // Collision Component
         CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
-        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.StaticBody, true);
-        collisionComponent.body.setUserData(item);
+        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.StaticBody, true, item, BodyFactory.ITEM_BITS, BodyFactory.PLAYER_BITS);
         item.add(collisionComponent);
 
         // Transform Component

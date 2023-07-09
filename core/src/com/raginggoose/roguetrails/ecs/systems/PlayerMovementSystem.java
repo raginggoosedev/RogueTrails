@@ -9,10 +9,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.Mapper;
-import com.raginggoose.roguetrails.ecs.components.CollisionComponent;
-import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
-import com.raginggoose.roguetrails.ecs.components.StateComponent;
-import com.raginggoose.roguetrails.ecs.components.TransformComponent;
+import com.raginggoose.roguetrails.ecs.components.*;
 
 /**
  * The system used to move the player based on user input
@@ -36,11 +33,20 @@ public class PlayerMovementSystem extends IteratingSystem {
         final StateComponent stateComponent = stateMapper.get(entity);
         Vector2 force = new Vector2(0, 0);
 
-        if (!collisionComponent.collided) {
+
+        EnemyComponent enemyComponent = null;
+        if (collisionComponent.collisionBody != null) {
+            if (collisionComponent.collisionBody.getUserData() instanceof Entity) {
+                enemyComponent = Mapper.ENEMY_MAPPER.get((Entity) collisionComponent.collisionBody.getUserData());
+            }
+        }
+
+
+        if (enemyComponent == null) {
             if (Gdx.input.isKeyPressed(Input.Keys.W))
                 force.y = speed;
             else if (Gdx.input.isKeyPressed(Input.Keys.S))
-            force.y = -speed;
+                force.y = -speed;
 
             if (Gdx.input.isKeyPressed(Input.Keys.A))
                 force.x = -speed;
@@ -48,8 +54,14 @@ public class PlayerMovementSystem extends IteratingSystem {
                 force.x = speed;
 
             stateComponent.setState(StateComponent.STATE_RIGHT);
-        }
 
-        collisionComponent.body.setLinearVelocity(force.x, force.y);
+            collisionComponent.body.setLinearVelocity(force.x, force.y);
+
+        } else {
+            Vector2 pushDirection = collisionComponent.collisionNormal.cpy();
+            Vector2 pushImpulse = pushDirection.scl(collisionComponent.pushStrength);
+            collisionComponent.body.applyLinearImpulse(pushImpulse, collisionComponent.body.getWorldCenter(), true);
+            collisionComponent.collisionBody = null;
+        }
     }
 }

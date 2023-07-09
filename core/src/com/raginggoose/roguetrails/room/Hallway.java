@@ -220,11 +220,11 @@ public class Hallway extends Room {
         //TODO make bodies
         BodyFactory bf = BodyFactory.getInstance(world);
         if (ORIENTATION == Orientation.VERTICAL) {
-            bf.makeLine(x, y, x, y + h, BodyDef.BodyType.StaticBody);
-            bf.makeLine(x + w, y, x + w, y + h, BodyDef.BodyType.StaticBody);
+            bf.makeLine(x, y, x, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS));
+            bf.makeLine(x + w, y, x + w, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS));
         } else if (ORIENTATION == Orientation.HORIZONTAL) {
-            bf.makeLine(x, y, x + w, y, BodyDef.BodyType.StaticBody);
-            bf.makeLine(x, y + h, x + w, y + h, BodyDef.BodyType.StaticBody);
+            bf.makeLine(x, y, x + w, y, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS));
+            bf.makeLine(x, y + h, x + w, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS));
         }
     }
 

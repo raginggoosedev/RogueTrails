@@ -53,34 +53,34 @@ public class Cell extends Room {
 
         // Create collision boxes for the top wall
         if (NORTH != null) {
-            bf.makeLine(x, y + h, hallwayPositionX, y + h, BodyDef.BodyType.StaticBody); // Left side top wall
-            bf.makeLine(hallwayPositionX + hallwayGap, y + h, x + w, y + h, BodyDef.BodyType.StaticBody); // Right side top wall
+            bf.makeLine(x, y + h, hallwayPositionX, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Left side top wall
+            bf.makeLine(hallwayPositionX + hallwayGap, y + h, x + w, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Right side top wall
         } else {
-            bf.makeLine(x, y + h, x + w, y + h, BodyDef.BodyType.StaticBody); // Full top wall
+            bf.makeLine(x, y + h, x + w, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Full top wall
         }
 
         // Create collision boxes for the right wall
         if (EAST != null) {
-            bf.makeLine(x + w, y, x + w, hallwayPositionY, BodyDef.BodyType.StaticBody); // Top side wall
-            bf.makeLine(x + w, hallwayPositionY + hallwayGap, x + w, y + h, BodyDef.BodyType.StaticBody); // Bottom side wall
+            bf.makeLine(x + w, y, x + w, hallwayPositionY, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Top side wall
+            bf.makeLine(x + w, hallwayPositionY + hallwayGap, x + w, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Bottom side wall
         } else {
-            bf.makeLine(x + w, y, x + w, y + h, BodyDef.BodyType.StaticBody); // Full right wall
+            bf.makeLine(x + w, y, x + w, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Full right wall
         }
 
         // Create collision boxes for the bottom wall
         if (SOUTH != null) {
-            bf.makeLine(x, y, hallwayPositionX, y, BodyDef.BodyType.StaticBody); // Left side wall
-            bf.makeLine(hallwayPositionX + hallwayGap, y, x + w, y, BodyDef.BodyType.StaticBody); // Right side wall
+            bf.makeLine(x, y, hallwayPositionX, y, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Left side wall
+            bf.makeLine(hallwayPositionX + hallwayGap, y, x + w, y, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Right side wall
         } else {
-            bf.makeLine(x, y, x + w, y, BodyDef.BodyType.StaticBody); // Full bottom wall
+            bf.makeLine(x, y, x + w, y, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Full bottom wall
         }
 
         // Create collision boxes for the left wall
         if (WEST != null) {
-            bf.makeLine(x, y, x, hallwayPositionY, BodyDef.BodyType.StaticBody); // Top side wall
-            bf.makeLine(x, hallwayPositionY + hallwayGap, x, y + h, BodyDef.BodyType.StaticBody); // Bottom side wall
+            bf.makeLine(x, y, x, hallwayPositionY, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Top side wall
+            bf.makeLine(x, hallwayPositionY + hallwayGap, x, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Bottom side wall
         } else {
-            bf.makeLine(x, y, x, y + h, BodyDef.BodyType.StaticBody); // Full left wall
+            bf.makeLine(x, y, x, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS)); // Full left wall
         }
     }
 
