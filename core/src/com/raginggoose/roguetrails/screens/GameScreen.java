@@ -79,7 +79,7 @@ public class GameScreen implements Screen {
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);
 
-        viewport = new ExtendViewport(16 * 4, 9 * 4, cam);
+        viewport = new ExtendViewport(16, 9, cam);
 
         // Create new Box2D world with no gravity
         world = new World(Vector2.Zero, true);

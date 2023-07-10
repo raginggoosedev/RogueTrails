@@ -42,7 +42,7 @@ public class PlayerMovementSystem extends IteratingSystem {
         }
 
 
-        if (enemyComponent == null) {
+        if (collisionComponent.pushStrength <= 0.0f) {
             if (Gdx.input.isKeyPressed(Input.Keys.W))
                 force.y = speed;
             else if (Gdx.input.isKeyPressed(Input.Keys.S))
@@ -59,8 +59,9 @@ public class PlayerMovementSystem extends IteratingSystem {
 
         } else {
             Vector2 pushDirection = collisionComponent.collisionNormal.cpy();
-            Vector2 pushImpulse = pushDirection.scl(collisionComponent.pushStrength);
-            collisionComponent.body.applyLinearImpulse(pushImpulse, collisionComponent.body.getWorldCenter(), true);
+            Vector2 pushImpulse = pushDirection.scl(-collisionComponent.pushStrength);
+            collisionComponent.body.setLinearVelocity(pushImpulse);
+            collisionComponent.pushStrength -= 0.5f;
             collisionComponent.collisionBody = null;
         }
     }

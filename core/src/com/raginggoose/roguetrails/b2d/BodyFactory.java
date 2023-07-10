@@ -58,6 +58,7 @@ public class BodyFactory {
         bodyDef.fixedRotation = true;
 
         Body body = world.createBody(bodyDef);
+        body.setUserData(null);
         EdgeShape edgeShape = new EdgeShape();
         edgeShape.set(x1 / PPM, y1 / PPM, x2 / PPM, y2 / PPM);
         FixtureDef fixtureDef = new FixtureDef();

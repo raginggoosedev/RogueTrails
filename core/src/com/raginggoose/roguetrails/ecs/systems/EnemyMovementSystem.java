@@ -46,11 +46,25 @@ public class EnemyMovementSystem extends IteratingSystem {
 
         CollisionComponent collisionComponent = Mapper.COLLISION_MAPPER.get(entity);
 
-        if (!collisionComponent.collided) {
+        boolean hittingPlayer = false;
+
+        if (collisionComponent.collided && collisionComponent.collisionBody != null)
+            if (collisionComponent.collisionBody.getUserData() == player)
+                hittingPlayer = true;
+
+        if (!hittingPlayer) {
             if (diffX < -1 || diffX > 1) force.x = speed * MathUtils.cos(angle);
             if (diffY < -1 || diffY > 1) force.y = speed * MathUtils.sin(angle);
         }
 
-        collisionComponent.body.setLinearVelocity(force.x, force.y);
+        if (collisionComponent.pushStrength <= 0.0f)
+            collisionComponent.body.setLinearVelocity(force.x, force.y);
+        else {
+            Vector2 pushDirection = collisionComponent.collisionNormal.cpy();
+            Vector2 pushImpulse = pushDirection.scl(-collisionComponent.pushStrength);
+            collisionComponent.body.setLinearVelocity(pushImpulse);
+            collisionComponent.pushStrength -= 0.5f;
+            collisionComponent.collisionBody = null;
+        }
     }
 }
