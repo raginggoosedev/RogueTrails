@@ -30,5 +30,7 @@ public class AnimationSystem extends IteratingSystem {
         RenderComponent renderComponent = renderMapper.get(entity);
         renderComponent.region = animationComponent.animations.get(stateComponent.getState()).getKeyFrame(stateComponent.time, stateComponent.isLooping);
         stateComponent.time += deltaTime;
+
     }
+
 }

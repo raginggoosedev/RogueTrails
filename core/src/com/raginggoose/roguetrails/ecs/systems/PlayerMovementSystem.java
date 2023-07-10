@@ -8,6 +8,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.raginggoose.roguetrails.dungeon.Dungeon;
+import com.raginggoose.roguetrails.ecs.Animations;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.*;
 
@@ -43,17 +44,27 @@ public class PlayerMovementSystem extends IteratingSystem {
 
 
         if (enemyComponent == null) {
-            if (Gdx.input.isKeyPressed(Input.Keys.W))
+            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
                 force.y = speed;
-            else if (Gdx.input.isKeyPressed(Input.Keys.S))
+                stateComponent.isLooping = true;
+                stateComponent.setState(StateComponent.STATE_UP);
+            } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
                 force.y = -speed;
-
-            if (Gdx.input.isKeyPressed(Input.Keys.A))
+                stateComponent.isLooping = true;
+                stateComponent.setState(StateComponent.STATE_DOWN);
+            } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
                 force.x = -speed;
-            else if (Gdx.input.isKeyPressed(Input.Keys.D))
+                stateComponent.isLooping = true;
+                stateComponent.setState(StateComponent.STATE_LEFT);
+            } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
                 force.x = speed;
-
-            stateComponent.setState(StateComponent.STATE_RIGHT);
+                stateComponent.isLooping = true;
+                stateComponent.setState(StateComponent.STATE_RIGHT);
+            } else {
+                stateComponent.setState(StateComponent.STATE_STOP);
+                stateComponent.isLooping = false;
+                Animations.frameRate = 0f;
+            }
 
             collisionComponent.body.setLinearVelocity(force.x, force.y);
 
@@ -63,5 +74,6 @@ public class PlayerMovementSystem extends IteratingSystem {
             collisionComponent.body.applyLinearImpulse(pushImpulse, collisionComponent.body.getWorldCenter(), true);
             collisionComponent.collisionBody = null;
         }
+
     }
 }
