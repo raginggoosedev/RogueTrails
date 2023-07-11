@@ -20,16 +20,17 @@ import com.raginggoose.roguetrails.screens.ScreenType;
  */
 public class Menu {
     private final Table table;
-    private final Stage stage;
+    private boolean isOpening;
+    private boolean isClosing;
 
     /**
      * Creates a new menu
+     *
      * @param stage the stage for the menu to be drawn on
-     * @param skin the skin used for the actors
-     * @param game the game being played
+     * @param skin  the skin used for the actors
+     * @param game  the game being played
      */
     public Menu(Stage stage, Skin skin, RogueTrails game) {
-        this.stage = stage;
 
         table = new Table();
         table.setFillParent(true);
@@ -79,13 +80,34 @@ public class Menu {
 
         table.setVisible(false);
         stage.addActor(table);
+
+        isOpening = false;
+        isClosing = false;
     }
 
     public void show() {
         table.setVisible(true);
+        table.addAction(Actions.sequence(Actions.run(() -> setOpening(true)), Actions.fadeIn(0.25f), Actions.run(() -> setOpening(false))));
     }
 
     public void hide() {
+        table.addAction(Actions.sequence(Actions.run(() -> setClosing(true)), Actions.fadeOut(0.25f), Actions.run(() -> setClosing(false))));
         table.setVisible(false);
+    }
+
+    private void setClosing(boolean isClosing) {
+        this.isClosing = isClosing;
+    }
+
+    public boolean isOpening() {
+        return isOpening;
+    }
+
+    public void setOpening(boolean isOpening) {
+        this.isOpening = isOpening;
+    }
+
+    public boolean isClosing() {
+        return isClosing;
     }
 }
