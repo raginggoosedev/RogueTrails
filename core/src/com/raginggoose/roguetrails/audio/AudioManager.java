@@ -30,12 +30,8 @@ public class AudioManager {
                     currentMusic.stop();
                 }
 
-                // Set current type to the new type and play the new music
-                currentMusicType = type;
-                currentMusic = assetLoader.manager.get(type.getFilePath(), Music.class);
-                currentMusic.setLooping(true);
-                currentMusic.setVolume(game.getPreferences().getMusicVolume());
-                currentMusic.play();
+                playMusic(type);
+
             } else {
                 assetLoader.manager.get(type.getFilePath(), Sound.class).play(game.getPreferences().getSoundVolume());
             }
@@ -44,8 +40,16 @@ public class AudioManager {
         } catch (Exception e) {
             // Handle the exception appropriately, such as logging an error message or providing fallback options
             Gdx.app.error(TAG, "Error playing audio: " + e.getMessage());
-            // Perform any necessary error handling, such as displaying an error message to the user or using a fallback audio
         }
+    }
+
+    private void playMusic(AudioType type) {
+        // Set current type to the new type and play the new music
+        currentMusicType = type;
+        currentMusic = assetLoader.manager.get(type.getFilePath(), Music.class);
+        currentMusic.setLooping(true);
+        currentMusic.setVolume(game.getPreferences().getMusicVolume());
+        currentMusic.play();
     }
 
     public void pauseMusic() {
@@ -66,5 +70,10 @@ public class AudioManager {
             // Handle the situation when currentMusic is null, such as logging an error or skipping the operation
             Gdx.app.error(TAG, "No music is currently playing.");
         }
+    }
+
+    public void changeVolume() {
+        if (currentMusic != null)
+            currentMusic.setVolume(game.getPreferences().getMusicVolume());
     }
 }
