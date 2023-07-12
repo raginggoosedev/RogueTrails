@@ -25,7 +25,6 @@ import com.raginggoose.roguetrails.ecs.ECSEngine;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.ItemComponent;
 import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
-import com.raginggoose.roguetrails.ecs.systems.DebugRenderingSystem;
 import com.raginggoose.roguetrails.ecs.systems.PlayerMovementSystem;
 import com.raginggoose.roguetrails.ecs.systems.RenderingSystem;
 import com.raginggoose.roguetrails.hud.HUD;
@@ -55,10 +54,10 @@ public class GameScreen implements Screen {
     private final Inventory inventory;
     private final PlayerComponent playerComponent;
     private final Menu menu;
-    public Dungeon dun;
-    private boolean paused;
     private final Box2DDebugRenderer debugRenderer;
     private final ExtendViewport viewport;
+    public Dungeon dun;
+    private boolean paused;
 
     /**
      * Create a new game screen to display and play the game
@@ -88,14 +87,14 @@ public class GameScreen implements Screen {
 
 
         debugRenderer = new Box2DDebugRenderer();
-        ecsEngine = new ECSEngine(shape, debugRenderer, batch, cam, assetLoader, world);
+        ecsEngine = new ECSEngine(batch, cam, assetLoader, world);
         ecsEngine.createPlayer(32, 32, 32, 32, 0);
 
         dun = makeDungeon();
 
         spawnItems(dun.getStart(), 200, 100);
 
-        ecsEngine.addSystem(new PlayerMovementSystem(dun));
+        ecsEngine.addSystem(new PlayerMovementSystem());
 
         skin = new Skin(Gdx.files.internal("skin.json"));
 
@@ -173,7 +172,6 @@ public class GameScreen implements Screen {
                 dun.addEnemies();
 
             // Game is not paused, logic and rendering should be done
-            processInput();
             updateGameLogic(delta);
             drawGame();
 
@@ -183,6 +181,9 @@ public class GameScreen implements Screen {
             // Game is paused, only rendering should be done
             drawPausedGame(delta);
         }
+
+
+        processInput();
 
         // Stage is drawn regardless
         stage.draw();
@@ -223,14 +224,21 @@ public class GameScreen implements Screen {
 
     private void processInput() {
         // If escape is pressed, the game is paused
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
-            pause();
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && !paused) {
+            // Wait until the menu is closed before player can open it
+            if (!menu.isClosing())
+                pause();
+        } else if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && paused) {
+            // Wait until the menu is opened before player can close it
+            if (!menu.isOpening())
+                resume();
+        }
     }
 
     private void updateGameLogic(float delta) {
         // Update entities and the physics world
         ecsEngine.update(delta);
-        world.step(1/60f, 6, 2);
+        world.step(1 / 60f, 6, 2);
     }
 
     private void drawGame() {
@@ -245,10 +253,16 @@ public class GameScreen implements Screen {
 
         // Set up projection matrix for rendering system
         batch.setProjectionMatrix(cam.combined);
+
+        if (RogueTrails.DEBUG) {
+            // Show debug rendering if the game is run in debug mode
+            debugRenderer.render(world, cam.combined);
+        }
     }
 
     /**
      * A method to continue rendering the game while it is paused
+     *
      * @param delta Time between the previous and current call to render()
      */
     private void drawPausedGame(float delta) {
@@ -259,7 +273,7 @@ public class GameScreen implements Screen {
 
         if (RogueTrails.DEBUG) {
             // Show debug rendering if the game is run in debug mode
-            ecsEngine.getSystem(DebugRenderingSystem.class).update(delta);
+            debugRenderer.render(world, cam.combined);
         }
 
         shape.setProjectionMatrix(cam.combined);

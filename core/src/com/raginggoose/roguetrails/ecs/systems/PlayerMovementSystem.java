@@ -7,7 +7,6 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
-import com.raginggoose.roguetrails.dungeon.Dungeon;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.*;
 
@@ -15,12 +14,10 @@ import com.raginggoose.roguetrails.ecs.components.*;
  * The system used to move the player based on user input
  */
 public class PlayerMovementSystem extends IteratingSystem {
-    private final Dungeon dun;
     private final ComponentMapper<StateComponent> stateMapper;
 
-    public PlayerMovementSystem(Dungeon dun) {
+    public PlayerMovementSystem() {
         super(Family.all(PlayerComponent.class, TransformComponent.class, CollisionComponent.class).get());
-        this.dun = dun;
         stateMapper = Mapper.STATE_MAPPER;
     }
 
@@ -32,15 +29,6 @@ public class PlayerMovementSystem extends IteratingSystem {
         float speed = playerComponent.speed;
         final StateComponent stateComponent = stateMapper.get(entity);
         Vector2 force = new Vector2(0, 0);
-
-
-        EnemyComponent enemyComponent = null;
-        if (collisionComponent.collisionBody != null) {
-            if (collisionComponent.collisionBody.getUserData() instanceof Entity) {
-                enemyComponent = Mapper.ENEMY_MAPPER.get((Entity) collisionComponent.collisionBody.getUserData());
-            }
-        }
-
 
         if (collisionComponent.pushStrength <= 0.0f) {
             if (Gdx.input.isKeyPressed(Input.Keys.W))
