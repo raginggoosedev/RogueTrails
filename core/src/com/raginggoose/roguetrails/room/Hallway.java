@@ -3,8 +3,12 @@ package com.raginggoose.roguetrails.room;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.raginggoose.roguetrails.collisions.CollisionBox;
-import com.raginggoose.roguetrails.collisions.CollisionWorld;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.World;
+import com.raginggoose.roguetrails.b2d.BodyFactory;
+
+import java.util.ArrayList;
 
 
 public class Hallway extends Room {
@@ -12,12 +16,12 @@ public class Hallway extends Room {
     //Room attributes
     private final int w;
     private final int h;
-    private final CollisionBox box;
     private final RoomType TYPE = RoomType.HALLWAY;
     private final Orientation ORIENTATION;
     public String name;
     private int x = 0;
     private int y = 0;
+    private final World world;
     //Adjacent rooms
     private Room NORTH = null;
     private Room EAST = null;
@@ -26,23 +30,19 @@ public class Hallway extends Room {
     private Room PARENT = null;
 
     //constructor without dimensions
-    public Hallway(Orientation orientation, CollisionWorld world) {
+    public Hallway(Orientation orientation, World world) {
         ORIENTATION = orientation;
         w = getDefaultWidth(orientation);
         h = getDefaultHeight(orientation);
-
-        box = new CollisionBox(new Vector2(x, y), w, h, this);
-        world.addCollisionBox(box);
+        this.world = world;
     }
 
     //constructor with dimensions
-    public Hallway(int w, int h, Orientation orientation, CollisionWorld world) {
+    public Hallway(int w, int h, Orientation orientation, World world) {
         ORIENTATION = orientation;
         this.w = w;
         this.h = h;
-
-        box = new CollisionBox(new Vector2(x, y), w, h, this);
-        world.addCollisionBox(box);
+        this.world = world;
     }
 
     private int getDefaultWidth(Orientation orientation) {
@@ -94,7 +94,7 @@ public class Hallway extends Room {
 
     @Override
     public void setNorth(Room room) {
-        if (ORIENTATION == Orientation.VERTICAL)
+        if (ORIENTATION == Orientation.VERTICAL) {
             if (PARENT == null) PARENT = room;
             if (NORTH == room) return;
 
@@ -103,6 +103,7 @@ public class Hallway extends Room {
             NORTH = room;
 
             room.setSouth(this);
+        }
     }
 
     @Override
@@ -112,7 +113,7 @@ public class Hallway extends Room {
 
     @Override
     public void setEast(Room room) {
-        if (ORIENTATION == Orientation.HORIZONTAL)
+        if (ORIENTATION == Orientation.HORIZONTAL) {
             if (PARENT == null) PARENT = room;
             if (EAST == room) return;
 
@@ -121,7 +122,9 @@ public class Hallway extends Room {
             EAST = room;
 
             room.setWest(this);
+        }
     }
+
 
     @Override
     public Room getSouth() {
@@ -130,7 +133,7 @@ public class Hallway extends Room {
 
     @Override
     public void setSouth(Room room) {
-        if (ORIENTATION == Orientation.VERTICAL)
+        if (ORIENTATION == Orientation.VERTICAL) {
             if (PARENT == null) PARENT = room;
             if (SOUTH == room) return;
 
@@ -139,6 +142,7 @@ public class Hallway extends Room {
             SOUTH = room;
 
             room.setNorth(this);
+        }
     }
 
     @Override
@@ -150,13 +154,11 @@ public class Hallway extends Room {
     public void setWest(Room room) {
         if (ORIENTATION == Orientation.HORIZONTAL)
             if (PARENT == null) PARENT = room;
-            if (WEST == room) return;
+        if (WEST == room) return;
 
-            room.setX(this.x - room.getWidth());
-            room.setY(this.y + this.h / 2 - room.getHeight() / 2);
-            WEST = room;
-
-            room.setEast(this);
+        room.setX(this.x - room.getWidth());
+        room.setY(this.y + this.h / 2 - room.getHeight() / 2);
+        WEST = room;
     }
 
     @Override
@@ -167,7 +169,7 @@ public class Hallway extends Room {
     @Override
     //public void draw(int x, int y, ShapeRenderer shape) {
     public void draw(ShapeRenderer shape) {
-        shape.rect(x, y, w, h);
+
     }
 
     @Override
@@ -203,8 +205,8 @@ public class Hallway extends Room {
     }
 
     @Override
-    public CollisionBox getBox() {
-        return box;
+    public Room getParent() {
+        return PARENT;
     }
 
     @Override
@@ -213,8 +215,16 @@ public class Hallway extends Room {
     }
 
     @Override
-    public Room getParent() {
-        return PARENT;
+    public void createCollisionBoxes() {
+        //TODO make bodies
+        BodyFactory bf = BodyFactory.getInstance(world);
+        if (ORIENTATION == Orientation.VERTICAL) {
+            bf.makeLine(x, y, x, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS));
+            bf.makeLine(x + w, y, x + w, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS));
+        } else if (ORIENTATION == Orientation.HORIZONTAL) {
+            bf.makeLine(x, y, x + w, y, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS));
+            bf.makeLine(x, y + h, x + w, y + h, BodyDef.BodyType.StaticBody, BodyFactory.STATIC_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.ENEMY_BITS));
+        }
     }
 
     @Override

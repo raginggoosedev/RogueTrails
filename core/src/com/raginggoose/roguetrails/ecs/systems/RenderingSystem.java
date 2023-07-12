@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import com.raginggoose.roguetrails.Constants;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.ZComparator;
 import com.raginggoose.roguetrails.ecs.components.RenderComponent;
@@ -49,12 +50,24 @@ public class RenderingSystem extends SortedIteratingSystem {
 
             TransformComponent transformComponent = Mapper.TRANSFORM_MAPPER.get(e);
 
-            batch.draw(renderComponent.region, transformComponent.position.x, transformComponent.position.y, transformComponent.width, transformComponent.height);
+            float texWidth = renderComponent.region.getRegionWidth();
+            float texHeight = renderComponent.region.getRegionHeight();
+
+            float originX = texWidth / 2f;
+            float originY = texHeight / 2f;
+
+            batch.draw(renderComponent.region, transformComponent.position.x - originX, transformComponent.position.y - originY, originX, originY, texWidth, texHeight, PixelsToMeters(transformComponent.scale.x), PixelsToMeters(transformComponent.scale.y), transformComponent.rotation);
+
         }
 
         batch.end();
 
         // All entities have now been rendered, clear the array
         renderQueue.clear();
+    }
+
+    // Method to convert pixels to meters
+    public static float PixelsToMeters(float pixelValue) {
+        return pixelValue * Constants.PIXELS_TO_METERS;
     }
 }

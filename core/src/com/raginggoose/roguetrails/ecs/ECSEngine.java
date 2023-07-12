@@ -3,18 +3,18 @@ package com.raginggoose.roguetrails.ecs;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.raginggoose.roguetrails.RogueTrails;
-import com.raginggoose.roguetrails.collisions.CollisionBox;
-import com.raginggoose.roguetrails.collisions.CollisionWorld;
+import com.raginggoose.roguetrails.b2d.BodyFactory;
 import com.raginggoose.roguetrails.ecs.components.*;
 import com.raginggoose.roguetrails.ecs.systems.*;
 import com.raginggoose.roguetrails.inventory.Inventory;
@@ -25,19 +25,17 @@ import com.raginggoose.roguetrails.loader.AssetLoader;
  */
 public class ECSEngine extends PooledEngine {
     public final static String TAG = ECSEngine.class.getSimpleName();
-    private final CollisionWorld world;
+    private final World world;
     public static final Color ENEMY_DEBUG_COLOUR = Color.RED;
     public static final Color PLAYER_DEBUG_COLOUR = Color.BLUE;
     public static final Color ITEM_DEBUG_COLOUR = Color.GREEN;
+
     private final Entity player;
     private final AssetLoader assetLoader;
 
-    public ECSEngine(ShapeRenderer s, SpriteBatch batch, OrthographicCamera cam, CollisionWorld world, AssetLoader assetLoader) {
+    public ECSEngine(SpriteBatch batch, OrthographicCamera cam, AssetLoader assetLoader, World world) {
         this.world = world;
         this.assetLoader = assetLoader;
-
-        if (RogueTrails.DEBUG)
-            this.addSystem(new DebugRenderingSystem(s));
 
         this.addSystem(new PlayerCameraSystem(cam));
 
@@ -48,6 +46,8 @@ public class ECSEngine extends PooledEngine {
         this.addSystem(new CollisionSystem());
 
         this.addSystem(new AnimationSystem());
+
+        this.addSystem(new PhysicsSystem(world));
 
         player = this.createEntity();
         this.addSystem(new InteractionSystem(player));
@@ -70,7 +70,7 @@ public class ECSEngine extends PooledEngine {
 
         // Player Component
         PlayerComponent playerComponent = this.createComponent(PlayerComponent.class);
-        playerComponent.speed = 2.0f;
+        playerComponent.speed = 4.0f;
         playerComponent.health = 3.0f;
         playerComponent.inventory = new Inventory();
         player.add(playerComponent);
@@ -99,7 +99,7 @@ public class ECSEngine extends PooledEngine {
         AnimationComponent animationComponent = this.createComponent(AnimationComponent.class);
 
         TextureAtlas playerAtlas = assetLoader.manager.get(AssetLoader.PLAYER_ATLAS);
-        Animation<TextureRegion> upAnim = new Animation<>(0.1f, playerAtlas.findRegions("walk"));
+        Animation<TextureRegion> upAnim = new Animation<>(0.1f, playerAtlas.findRegions("rightwalk"));
 
         animationComponent.animations.put(StateComponent.STATE_UP, upAnim);
         animationComponent.animations.put(StateComponent.STATE_DOWN, upAnim);
@@ -111,13 +111,13 @@ public class ECSEngine extends PooledEngine {
         // Render Component
         RenderComponent renderComponent = this.createComponent(RenderComponent.class);
         renderComponent.shouldRender = true;
-        renderComponent.region = playerAtlas.findRegion("walk", 1);
+        renderComponent.region = playerAtlas.findRegion("rightwalk", 1);
         player.add(renderComponent);
 
         // Collision Component
         CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
-        collisionComponent.box = new CollisionBox(transformComponent.prevPosition, transformComponent.width, transformComponent.height, player);
-        world.addCollisionBox(collisionComponent.box);
+
+        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.DynamicBody, false, player, BodyFactory.PLAYER_BITS, (short) (BodyFactory.ENEMY_BITS | BodyFactory.ITEM_BITS | BodyFactory.STATIC_BITS));
         player.add(collisionComponent);
 
         // Debug Component
@@ -173,8 +173,8 @@ public class ECSEngine extends PooledEngine {
 
         // Collision Component
         CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
-        collisionComponent.box = new CollisionBox(transformComponent.prevPosition, transformComponent.width, transformComponent.height, enemy);
-        world.addCollisionBox(collisionComponent.box);
+
+        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.DynamicBody, false, enemy, BodyFactory.ENEMY_BITS, (short) (BodyFactory.PLAYER_BITS | BodyFactory.STATIC_BITS));
         enemy.add(collisionComponent);
 
         // Debug Component
@@ -205,6 +205,11 @@ public class ECSEngine extends PooledEngine {
         itemComponent.collected = false;
         item.add(itemComponent);
         sBuild.append("Item Type: ").append(itemComponent).append("\n");
+
+        // Collision Component
+        CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);
+        collisionComponent.body = BodyFactory.getInstance(world).makeBox(x, y, w, h, BodyDef.BodyType.StaticBody, true, item, BodyFactory.ITEM_BITS, BodyFactory.PLAYER_BITS);
+        item.add(collisionComponent);
 
         // Transform Component
         TransformComponent transformComponent = this.createComponent(TransformComponent.class);

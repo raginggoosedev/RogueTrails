@@ -13,9 +13,11 @@ public class HUD {
     private final HorizontalGroup healthGroup;
     private final HorizontalGroup inventoryGroup;
     private final Skin skin;
+    private final Stage stage;
 
-    public HUD(Inventory inventory, Skin skin, float hp) {
+    public HUD(Inventory inventory, Skin skin, float hp, Stage stage) {
         this.skin = skin;
+        this.stage = stage;
         inventoryGroup = new HorizontalGroup();
         inventoryGroup.space(10f);
 
@@ -45,14 +47,16 @@ public class HUD {
             hpLabel.setColor(Color.RED);
             healthGroup.addActor(hpLabel);
         }
+
+        stage.addActor(inventoryGroup);
+        inventoryGroup.setPosition(10f, 10f);
+
+        stage.addActor(healthGroup);
+        healthGroup.setPosition(10f, stage.getHeight() - healthGroup.getHeight() - 10f);
     }
 
     public void setStage(Stage s) {
-        s.addActor(inventoryGroup);
-        inventoryGroup.setPosition(10f, 10f);
 
-        s.addActor(healthGroup);
-        healthGroup.setPosition(10f, s.getHeight() - healthGroup.getHeight() - 10f);
     }
 
     public void updateInventory(Inventory inventory) {
@@ -79,5 +83,10 @@ public class HUD {
             hpLabel.setColor(Color.RED);
             healthGroup.addActor(hpLabel);
         }
+    }
+
+    public void resize(int width, int height) {
+        inventoryGroup.setPosition(10f, 10f);
+        healthGroup.setPosition(10f, height - healthGroup.getHeight() - 10f);
     }
 }
