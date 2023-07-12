@@ -11,7 +11,6 @@ import com.raginggoose.roguetrails.ecs.ECSEngine;
 public class Cell extends Room {
 
     //Room attributes
-    private static final float WALL_THICKNESS = 5;
     private final int w;
     private final int h;
     private final RoomType TYPE = RoomType.CELL;

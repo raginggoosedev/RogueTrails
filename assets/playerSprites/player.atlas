@@ -1,93 +1,303 @@
 player.png
-	size: 128, 256
+	size: 2048, 64
 	repeat: none
-idle
-	index: 18
-	bounds: 0, 192, 32, 32
-idle
-	index: 9
-	bounds: 32, 224, 32, 32
-idle
-	index: 10
-	bounds: 0, 160, 32, 32
-idle
+deathleft
 	index: 1
-	bounds: 64, 224, 32, 32
-idle
-	index: 15
-	bounds: 0, 128, 32, 32
-idle
-	index: 6
-	bounds: 64, 192, 32, 32
-idle
-	index: 20
-	bounds: 96, 224, 32, 32
-idle
-	index: 12
-	bounds: 32, 128, 32, 32
-idle
-	index: 3
-	bounds: 96, 192, 32, 32
-idle
-	index: 17
-	bounds: 0, 64, 32, 32
-idle
-	index: 8
-	bounds: 32, 96, 32, 32
-idle
-	index: 14
-	bounds: 0, 32, 32, 32
-idle
-	index: 5
-	bounds: 32, 64, 32, 32
-idle
-	index: 19
-	bounds: 64, 96, 32, 32
-idle
-	index: 11
 	bounds: 0, 0, 32, 32
-idle
-	index: 2
-	bounds: 64, 64, 32, 32
-idle
-	index: 16
-	bounds: 96, 96, 32, 32
-idle
-	index: 7
-	bounds: 32, 0, 32, 32
-idle
-	index: 13
-	bounds: 96, 64, 32, 32
-idle
-	index: 4
-	bounds: 64, 0, 32, 32
-walK
-	index: 9
-	bounds: 32, 160, 32, 32
-walk
-	index: 1
-	bounds: 0, 224, 32, 32
-walk
-	index: 6
-	bounds: 32, 192, 32, 32
-walk
-	index: 3
-	bounds: 0, 96, 32, 32
-walk
-	index: 8
-	bounds: 64, 160, 32, 32
-walk
-	index: 5
-	bounds: 64, 128, 32, 32
-walk
+idleleft
 	index: 10
-	bounds: 96, 160, 32, 32
-walk
+	bounds: 0, 0, 32, 32
+deathleft
 	index: 2
-	bounds: 96, 128, 32, 32
-walk
-	index: 7
-	bounds: 32, 32, 32, 32
-walk
+	bounds: 32, 0, 32, 32
+deathleft
+	index: 3
+	bounds: 64, 0, 32, 32
+deathleft
 	index: 4
+	bounds: 96, 0, 32, 32
+deathleft
+	index: 5
+	bounds: 128, 0, 32, 32
+deathleft
+	index: 6
+	bounds: 160, 0, 32, 32
+deathleft
+	index: 7
+	bounds: 192, 0, 32, 32
+deathleft
+	index: 8
+	bounds: 224, 0, 32, 32
+deathleft
+	index: 9
+	bounds: 256, 0, 32, 32
+deathleft
+	index: 10
+	bounds: 288, 0, 32, 32
+deathright
+	index: 1
+	bounds: 320, 0, 32, 32
+idleright
+	index: 1
+	bounds: 320, 0, 32, 32
+deathright
+	index: 2
+	bounds: 352, 0, 32, 32
+deathright
+	index: 3
+	bounds: 384, 0, 32, 32
+deathright
+	index: 4
+	bounds: 416, 0, 32, 32
+deathright
+	index: 5
+	bounds: 448, 0, 32, 32
+deathright
+	index: 6
+	bounds: 480, 0, 32, 32
+deathright
+	index: 7
+	bounds: 512, 0, 32, 32
+deathright
+	index: 8
+	bounds: 544, 0, 32, 32
+deathright
+	index: 9
+	bounds: 576, 0, 32, 32
+deathright
+	index: 10
+	bounds: 608, 0, 32, 32
+idleleft
+	index: 1
+	bounds: 640, 0, 32, 32
+idleleft
+	index: 2
+	bounds: 672, 0, 32, 32
+idleleft
+	index: 3
+	bounds: 704, 0, 32, 32
+idleleft
+	index: 4
+	bounds: 736, 0, 32, 32
+idleleft
+	index: 5
+	bounds: 768, 0, 32, 32
+idleleft
+	index: 6
+	bounds: 800, 0, 32, 32
+idleleft
+	index: 7
+	bounds: 832, 0, 32, 32
+idleleft
+	index: 8
+	bounds: 864, 0, 32, 32
+idleleft
+	index: 9
+	bounds: 896, 0, 32, 32
+idleleft
+	index: 11
+	bounds: 928, 0, 32, 32
+idleleft
+	index: 12
+	bounds: 960, 0, 32, 32
+idleleft
+	index: 13
+	bounds: 992, 0, 32, 32
+idleleft
+	index: 14
+	bounds: 1024, 0, 32, 32
+idleleft
+	index: 15
+	bounds: 1056, 0, 32, 32
+idleleft
+	index: 16
+	bounds: 1088, 0, 32, 32
+idleleft
+	index: 17
+	bounds: 1120, 0, 32, 32
+idleleft
+	index: 18
+	bounds: 1152, 0, 32, 32
+idleleft
+	index: 19
+	bounds: 1184, 0, 32, 32
+idleleft
+	index: 20
+	bounds: 1216, 0, 32, 32
+idleright
+	index: 2
+	bounds: 1248, 0, 32, 32
+idleright
+	index: 3
+	bounds: 1280, 0, 32, 32
+idleright
+	index: 4
+	bounds: 1312, 0, 32, 32
+idleright
+	index: 5
+	bounds: 1344, 0, 32, 32
+idleright
+	index: 6
+	bounds: 1376, 0, 32, 32
+idleright
+	index: 7
+	bounds: 1408, 0, 32, 32
+idleright
+	index: 8
+	bounds: 1440, 0, 32, 32
+idleright
+	index: 9
+	bounds: 1472, 0, 32, 32
+idleright
+	index: 10
+	bounds: 1504, 0, 32, 32
+idleright
+	index: 11
+	bounds: 1536, 0, 32, 32
+idleright
+	index: 12
+	bounds: 1568, 0, 32, 32
+idleright
+	index: 13
+	bounds: 1600, 0, 32, 32
+idleright
+	index: 14
+	bounds: 1632, 0, 32, 32
+idleright
+	index: 15
+	bounds: 1664, 0, 32, 32
+idleright
+	index: 16
+	bounds: 1696, 0, 32, 32
+idleright
+	index: 17
+	bounds: 1728, 0, 32, 32
+idleright
+	index: 18
+	bounds: 1760, 0, 32, 32
+idleright
+	index: 19
+	bounds: 1792, 0, 32, 32
+idleright
+	index: 20
+	bounds: 1824, 0, 32, 32
+leftattack
+	index: 1
+	bounds: 1856, 0, 32, 32
+leftattack
+	index: 2
+	bounds: 1888, 0, 32, 32
+leftattack
+	index: 3
+	bounds: 1920, 0, 32, 32
+leftattack
+	index: 4
+	bounds: 1952, 0, 32, 32
+leftattack
+	index: 5
+	bounds: 1984, 0, 32, 32
+leftattack
+	index: 6
+	bounds: 2016, 0, 32, 32
+leftattack
+	index: 7
+	bounds: 0, 32, 32, 32
+leftattack
+	index: 8
+	bounds: 32, 32, 32, 32
+leftattack
+	index: 9
 	bounds: 64, 32, 32, 32
+leftattack
+	index: 10
+	bounds: 96, 32, 32, 32
+leftwalk
+	index: 1
+	bounds: 128, 32, 32, 32
+leftwalk
+	index: 2
+	bounds: 160, 32, 32, 32
+leftwalk
+	index: 3
+	bounds: 192, 32, 32, 32
+leftwalk
+	index: 4
+	bounds: 224, 32, 32, 32
+leftwalk
+	index: 5
+	bounds: 256, 32, 32, 32
+leftwalk
+	index: 6
+	bounds: 288, 32, 32, 32
+leftwalk
+	index: 7
+	bounds: 320, 32, 32, 32
+leftwalk
+	index: 8
+	bounds: 352, 32, 32, 32
+leftwalk
+	index: 9
+	bounds: 384, 32, 32, 32
+leftwalk
+	index: 10
+	bounds: 416, 32, 32, 32
+rightattack
+	index: 1
+	bounds: 448, 32, 32, 32
+rightattack
+	index: 2
+	bounds: 480, 32, 32, 32
+rightattack
+	index: 3
+	bounds: 512, 32, 32, 32
+rightattack
+	index: 4
+	bounds: 544, 32, 32, 32
+rightattack
+	index: 5
+	bounds: 576, 32, 32, 32
+rightattack
+	index: 6
+	bounds: 608, 32, 32, 32
+rightattack
+	index: 7
+	bounds: 640, 32, 32, 32
+rightattack
+	index: 8
+	bounds: 672, 32, 32, 32
+rightattack
+	index: 9
+	bounds: 704, 32, 32, 32
+rightattack
+	index: 10
+	bounds: 736, 32, 32, 32
+rightwalk
+	index: 1
+	bounds: 768, 32, 32, 32
+rightwalk
+	index: 2
+	bounds: 800, 32, 32, 32
+rightwalk
+	index: 3
+	bounds: 832, 32, 32, 32
+rightwalk
+	index: 4
+	bounds: 864, 32, 32, 32
+rightwalk
+	index: 5
+	bounds: 896, 32, 32, 32
+rightwalk
+	index: 6
+	bounds: 928, 32, 32, 32
+rightwalk
+	index: 7
+	bounds: 960, 32, 32, 32
+rightwalk
+	index: 8
+	bounds: 992, 32, 32, 32
+rightwalk
+	index: 9
+	bounds: 1024, 32, 32, 32
+rightwalk
+	index: 10
+	bounds: 1056, 32, 32, 32
