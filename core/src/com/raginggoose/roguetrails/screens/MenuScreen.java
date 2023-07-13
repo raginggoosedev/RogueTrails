@@ -26,8 +26,6 @@ public class MenuScreen implements Screen {
         skin = game.getAssetManager().manager.get(AssetLoader.GAME_SKIN);
         this.game = game;
 
-
-
         Table table = new Table();
         table.setFillParent(true);
 

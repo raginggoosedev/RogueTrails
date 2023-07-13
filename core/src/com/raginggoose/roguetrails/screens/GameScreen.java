@@ -36,7 +36,7 @@ import com.raginggoose.roguetrails.room.Hallway;
 import com.raginggoose.roguetrails.room.Orientation;
 import com.raginggoose.roguetrails.room.Room;
 
-import static com.raginggoose.roguetrails.Constants.PPM;
+import static com.raginggoose.roguetrails.Constants.*;
 
 public class GameScreen implements Screen {
     private final RogueTrails game;
@@ -122,16 +122,16 @@ public class GameScreen implements Screen {
     }
 
     public Dungeon makeDungeon() {
-        Cell start = new Cell(300, 300, ecsEngine, world);
-        Hallway hall1 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
-        Cell cellA = new Cell(300, 300, ecsEngine, world);
-        Hallway hall2 = new Hallway(80, 300, Orientation.VERTICAL, world);
-        Hallway hall3 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
-        Cell cellB = new Cell(300, 300, ecsEngine, world);
-        Cell cellD = new Cell(100, 100, ecsEngine, world);
-        Hallway hall4 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
-        Cell cellC = new Cell(1000, 1000, ecsEngine, world);
-        Cell cellE = new Cell(80, 80, ecsEngine, world);
+        Cell start = new Cell(10 * TILE_SIZE, 10 * TILE_SIZE, ecsEngine, world);
+        Hallway hall1 = new Hallway(10 * TILE_SIZE, 2 * TILE_SIZE, Orientation.HORIZONTAL, world);
+        Cell cellA = new Cell(10 * TILE_SIZE, 10 * TILE_SIZE, ecsEngine, world);
+        Hallway hall2 = new Hallway(TILE_SIZE * 2, 10 * TILE_SIZE, Orientation.VERTICAL, world);
+        Hallway hall3 = new Hallway(10 * TILE_SIZE, TILE_SIZE * 2, Orientation.HORIZONTAL, world);
+        Cell cellB = new Cell(10 * TILE_SIZE, 10 * TILE_SIZE, ecsEngine, world);
+        Cell cellD = new Cell(10 * TILE_SIZE, 100, ecsEngine, world);
+        Hallway hall4 = new Hallway(10 * TILE_SIZE, TILE_SIZE * 2, Orientation.HORIZONTAL, world);
+        Cell cellC = new Cell(20 * TILE_SIZE, 20 * TILE_SIZE, ecsEngine, world);
+        Cell cellE = new Cell(TILE_SIZE * 2, TILE_SIZE * 2, ecsEngine, world);
 
         Dungeon dungeon = new Dungeon(start, null, world);
 
@@ -144,7 +144,6 @@ public class GameScreen implements Screen {
         cellE.setWest(hall4);
         hall4.setWest(cellB);
         cellB.setSouth(cellD);
-
 
         dungeon.createCollisionBoxes();
 
@@ -175,8 +174,6 @@ public class GameScreen implements Screen {
             updateGameLogic(delta);
             drawGame();
 
-            hud.updateInventory(inventory);
-            hud.updateHealth(playerComponent.health);
         } else {
             // Game is paused, only rendering should be done
             drawPausedGame(delta);
@@ -238,7 +235,10 @@ public class GameScreen implements Screen {
     private void updateGameLogic(float delta) {
         // Update entities and the physics world
         ecsEngine.update(delta);
-        world.step(1 / 60f, 6, 2);
+        world.step(TIME_STEP, 6, 2);
+
+        hud.updateInventory(inventory);
+        hud.updateHealth(playerComponent.health);
     }
 
     private void drawGame() {

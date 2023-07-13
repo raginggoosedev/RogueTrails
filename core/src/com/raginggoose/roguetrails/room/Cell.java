@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.raginggoose.roguetrails.Constants;
 import com.raginggoose.roguetrails.b2d.BodyFactory;
 import com.raginggoose.roguetrails.ecs.ECSEngine;
 
@@ -42,7 +43,7 @@ public class Cell extends Room {
     }
 
     public void createCollisionBoxes() {
-        int hallwayGap = 80; // Adjust the gap width as needed
+        int hallwayGap = Constants.TILE_SIZE * 2; // Adjust the gap width as needed
 
         // Calculate the position of the hallway gap for both width and height
         int hallwayPositionX = (w - hallwayGap) / 2 + x;
