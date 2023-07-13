@@ -5,10 +5,7 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -31,11 +28,13 @@ public class ECSEngine extends PooledEngine {
     public static final Color ITEM_DEBUG_COLOUR = Color.GREEN;
 
     private final Entity player;
-    private final AssetLoader assetLoader;
+
 
     public ECSEngine(SpriteBatch batch, OrthographicCamera cam, AssetLoader assetLoader, World world) {
         this.world = world;
-        this.assetLoader = assetLoader;
+        new Animations(assetLoader);
+        if (RogueTrails.DEBUG)
+            this.addSystem(new DebugRenderingSystem(s, debug, world, cam));
 
         this.addSystem(new PlayerCameraSystem(cam));
 
@@ -87,26 +86,26 @@ public class ECSEngine extends PooledEngine {
         sBuild.append("Player Position: ").append(transformComponent.position.toString()).append("\n");
         sBuild.append("Player Width & Height: ").append(transformComponent.width).append(", ").append(transformComponent.height).append("\n");
 
-
+        // Render Component
+        RenderComponent renderComponent = this.createComponent(RenderComponent.class);
+        renderComponent.shouldRender = true;
+        renderComponent.region = Animations.playerAtlas.findRegion("walk", 1);;
+        player.add(renderComponent);
 
         // State Component
         StateComponent stateComponent = this.createComponent(StateComponent.class);
-        stateComponent.setState(StateComponent.STATE_DOWN);
-        stateComponent.isLooping = true;
+        stateComponent.setState(StateComponent.STATE_STOP);
         player.add(stateComponent);
 
         // Animation Component
         AnimationComponent animationComponent = this.createComponent(AnimationComponent.class);
 
-        TextureAtlas playerAtlas = assetLoader.manager.get(AssetLoader.PLAYER_ATLAS);
-        Animation<TextureRegion> upAnim = new Animation<>(0.1f, playerAtlas.findRegions("rightwalk"));
 
-        animationComponent.animations.put(StateComponent.STATE_UP, upAnim);
-        animationComponent.animations.put(StateComponent.STATE_DOWN, upAnim);
-        animationComponent.animations.put(StateComponent.STATE_LEFT, upAnim);
-        animationComponent.animations.put(StateComponent.STATE_RIGHT, upAnim);
-
-        player.add(animationComponent);
+        animationComponent.animations.put(StateComponent.STATE_STOP, Animations.stop);
+        animationComponent.animations.put(StateComponent.STATE_UP, Animations.upAnim);
+        animationComponent.animations.put(StateComponent.STATE_DOWN, Animations.upAnim);
+        animationComponent.animations.put(StateComponent.STATE_LEFT, Animations.upAnim);
+        animationComponent.animations.put(StateComponent.STATE_RIGHT, Animations.upAnim);
 
         // Render Component
         RenderComponent renderComponent = this.createComponent(RenderComponent.class);
