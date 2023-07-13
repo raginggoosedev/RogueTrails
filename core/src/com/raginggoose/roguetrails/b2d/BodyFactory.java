@@ -39,8 +39,6 @@ public class BodyFactory {
         PolygonShape poly = new PolygonShape();
         poly.setAsBox(w / 2f / PPM, h / 2f / PPM);
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 0.0011f;
-        fixtureDef.friction = 0.46f;
         fixtureDef.isSensor = isSensor;
         fixtureDef.filter.categoryBits = categoryBits;
         fixtureDef.filter.maskBits = maskBits;
@@ -58,6 +56,7 @@ public class BodyFactory {
         bodyDef.fixedRotation = true;
 
         Body body = world.createBody(bodyDef);
+        body.setUserData(null);
         EdgeShape edgeShape = new EdgeShape();
         edgeShape.set(x1 / PPM, y1 / PPM, x2 / PPM, y2 / PPM);
         FixtureDef fixtureDef = new FixtureDef();

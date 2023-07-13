@@ -32,6 +32,9 @@ public class SettingsScreen implements Screen {
         volumeMusicSlider.setValue(game.getPreferences().getMusicVolume());
         volumeMusicSlider.addListener(event -> {
             game.getPreferences().setMusicVolume(volumeMusicSlider.getValue());
+
+            // Update current music volume
+            game.getAudioManager().changeVolume();
             return false;
         });
 
@@ -49,6 +52,11 @@ public class SettingsScreen implements Screen {
         musicCheckbox.addListener(event -> {
             boolean enabled = musicCheckbox.isChecked();
             game.getPreferences().setMusicEnabled(enabled);
+
+            if (!enabled)
+                game.getAudioManager().pauseMusic();
+            else
+                game.getAudioManager().resumeMusic();
             return false;
         });
 
@@ -91,7 +99,6 @@ public class SettingsScreen implements Screen {
         table.add(soundEffectsCheckbox).expand().fill().pad(10, 10, 10, 10);
         table.row().pad(10, 0, 0, 10);
         table.add(backButton).colspan(2).expand().fill().pad(10, 10, 10, 10);
-
 
 
         stage.addActor(table);

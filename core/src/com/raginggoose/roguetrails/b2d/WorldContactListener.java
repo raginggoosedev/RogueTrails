@@ -54,27 +54,23 @@ public class WorldContactListener implements ContactListener {
             CollisionComponent collisionComponent = Mapper.COLLISION_MAPPER.get(e1);
             collisionComponent.collided = false;
             collisionComponent.collisionBody = null;
-            collisionComponent.pushStrength = 0.0f;
 
             // e2 collision component
             collisionComponent = Mapper.COLLISION_MAPPER.get(e2);
             collisionComponent.collided = false;
             collisionComponent.collisionBody = null;
-            collisionComponent.pushStrength = 0.0f;
 
         } else if (fA.getBody().getUserData() instanceof Entity) {
             Entity e = (Entity) fA.getBody().getUserData();
             CollisionComponent collisionComponent = Mapper.COLLISION_MAPPER.get(e);
             collisionComponent.collided = false;
             collisionComponent.collisionBody = null;
-            collisionComponent.pushStrength = 0.0f;
 
         } else if (fB.getBody().getUserData() instanceof Entity) {
             Entity e = (Entity) fB.getBody().getUserData();
             CollisionComponent collisionComponent = Mapper.COLLISION_MAPPER.get(e);
             collisionComponent.collided = false;
             collisionComponent.collisionBody = null;
-            collisionComponent.pushStrength = 0.0f;
 
         }
     }
@@ -94,6 +90,20 @@ public class WorldContactListener implements ContactListener {
             Vector2 collisionNormal = manifold.getLocalNormal();
             collisionComponentA.collisionNormal = collisionNormal.cpy();
             collisionComponentB.collisionNormal = collisionNormal.cpy();
+        } else if (fixtureA.getBody().getUserData() instanceof Entity) {
+            Entity entity = (Entity) fixtureA.getBody().getUserData();
+
+            CollisionComponent collisionComponent = Mapper.COLLISION_MAPPER.get(entity);
+
+            Vector2 collisionNormal = manifold.getLocalNormal();
+            collisionComponent.collisionNormal = collisionNormal.cpy();
+        } else if (fixtureB.getBody().getUserData() instanceof Entity) {
+            Entity entity = (Entity) fixtureB.getBody().getUserData();
+
+            CollisionComponent collisionComponent = Mapper.COLLISION_MAPPER.get(entity);
+
+            Vector2 collisionNormal = manifold.getLocalNormal();
+            collisionComponent.collisionNormal = collisionNormal.cpy();
         }
     }
 

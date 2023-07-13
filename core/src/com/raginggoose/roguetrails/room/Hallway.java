@@ -13,7 +13,6 @@ import java.util.ArrayList;
 
 public class Hallway extends Room {
 
-    private static final float WALL_WIDTH = 20;
     //Room attributes
     private final int w;
     private final int h;

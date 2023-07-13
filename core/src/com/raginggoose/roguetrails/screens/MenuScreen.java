@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.loader.AssetLoader;
@@ -21,7 +22,7 @@ public class MenuScreen implements Screen {
     private final RogueTrails game;
 
     public MenuScreen(RogueTrails game) {
-        stage = new Stage(new ScreenViewport());
+        stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         skin = game.getAssetManager().manager.get(AssetLoader.GAME_SKIN);
         this.game = game;
 
@@ -81,7 +82,7 @@ public class MenuScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        stage.getViewport().update(width, height, true);
     }
 
     @Override

@@ -30,7 +30,7 @@ public class ECSEngine extends PooledEngine {
     private final Entity player;
 
 
-    public ECSEngine(ShapeRenderer s, Box2DDebugRenderer debug, SpriteBatch batch, OrthographicCamera cam, AssetLoader assetLoader, World world) {
+    public ECSEngine(SpriteBatch batch, OrthographicCamera cam, AssetLoader assetLoader, World world) {
         this.world = world;
         new Animations(assetLoader);
         if (RogueTrails.DEBUG)
@@ -100,15 +100,18 @@ public class ECSEngine extends PooledEngine {
         // Animation Component
         AnimationComponent animationComponent = this.createComponent(AnimationComponent.class);
 
+
         animationComponent.animations.put(StateComponent.STATE_STOP, Animations.stop);
         animationComponent.animations.put(StateComponent.STATE_UP, Animations.upAnim);
         animationComponent.animations.put(StateComponent.STATE_DOWN, Animations.upAnim);
         animationComponent.animations.put(StateComponent.STATE_LEFT, Animations.upAnim);
         animationComponent.animations.put(StateComponent.STATE_RIGHT, Animations.upAnim);
 
-        player.add(animationComponent);
-
-
+        // Render Component
+        RenderComponent renderComponent = this.createComponent(RenderComponent.class);
+        renderComponent.shouldRender = true;
+        renderComponent.region = playerAtlas.findRegion("rightwalk", 1);
+        player.add(renderComponent);
 
         // Collision Component
         CollisionComponent collisionComponent = this.createComponent(CollisionComponent.class);

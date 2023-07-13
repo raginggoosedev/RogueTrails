@@ -25,7 +25,6 @@ import com.raginggoose.roguetrails.ecs.ECSEngine;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.ecs.components.ItemComponent;
 import com.raginggoose.roguetrails.ecs.components.PlayerComponent;
-import com.raginggoose.roguetrails.ecs.systems.DebugRenderingSystem;
 import com.raginggoose.roguetrails.ecs.systems.PlayerMovementSystem;
 import com.raginggoose.roguetrails.ecs.systems.RenderingSystem;
 import com.raginggoose.roguetrails.hud.HUD;
@@ -37,7 +36,7 @@ import com.raginggoose.roguetrails.room.Hallway;
 import com.raginggoose.roguetrails.room.Orientation;
 import com.raginggoose.roguetrails.room.Room;
 
-import static com.raginggoose.roguetrails.Constants.PPM;
+import static com.raginggoose.roguetrails.Constants.*;
 
 public class GameScreen implements Screen {
     private final RogueTrails game;
@@ -55,10 +54,10 @@ public class GameScreen implements Screen {
     private final Inventory inventory;
     private final PlayerComponent playerComponent;
     private final Menu menu;
-    public Dungeon dun;
-    private boolean paused;
     private final Box2DDebugRenderer debugRenderer;
     private final ExtendViewport viewport;
+    public Dungeon dun;
+    private boolean paused;
 
     /**
      * Create a new game screen to display and play the game
@@ -79,7 +78,7 @@ public class GameScreen implements Screen {
         cam = new OrthographicCamera();
         cam.setToOrtho(false, Gdx.graphics.getWidth() / PPM, Gdx.graphics.getHeight() / PPM);
 
-        viewport = new ExtendViewport(16 * 4, 9 * 4, cam);
+        viewport = new ExtendViewport(16, 9, cam);
 
         // Create new Box2D world with no gravity
         world = new World(Vector2.Zero, true);
@@ -88,14 +87,14 @@ public class GameScreen implements Screen {
 
 
         debugRenderer = new Box2DDebugRenderer();
-        ecsEngine = new ECSEngine(shape, debugRenderer, batch, cam, assetLoader, world);
+        ecsEngine = new ECSEngine(batch, cam, assetLoader, world);
         ecsEngine.createPlayer(32, 32, 32, 32, 0);
 
         dun = makeDungeon();
 
         spawnItems(dun.getStart(), 200, 100);
 
-        ecsEngine.addSystem(new PlayerMovementSystem(dun));
+        ecsEngine.addSystem(new PlayerMovementSystem());
 
         skin = new Skin(Gdx.files.internal("skin.json"));
 
@@ -123,16 +122,16 @@ public class GameScreen implements Screen {
     }
 
     public Dungeon makeDungeon() {
-        Cell start = new Cell(300, 300, ecsEngine, world);
-        Hallway hall1 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
-        Cell cellA = new Cell(300, 300, ecsEngine, world);
-        Hallway hall2 = new Hallway(80, 300, Orientation.VERTICAL, world);
-        Hallway hall3 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
-        Cell cellB = new Cell(300, 300, ecsEngine, world);
-        Cell cellD = new Cell(100, 100, ecsEngine, world);
-        Hallway hall4 = new Hallway(300, 80, Orientation.HORIZONTAL, world);
-        Cell cellC = new Cell(1000, 1000, ecsEngine, world);
-        Cell cellE = new Cell(80, 80, ecsEngine, world);
+        Cell start = new Cell(10 * TILE_SIZE, 10 * TILE_SIZE, ecsEngine, world);
+        Hallway hall1 = new Hallway(10 * TILE_SIZE, 2 * TILE_SIZE, Orientation.HORIZONTAL, world);
+        Cell cellA = new Cell(10 * TILE_SIZE, 10 * TILE_SIZE, ecsEngine, world);
+        Hallway hall2 = new Hallway(TILE_SIZE * 2, 10 * TILE_SIZE, Orientation.VERTICAL, world);
+        Hallway hall3 = new Hallway(10 * TILE_SIZE, TILE_SIZE * 2, Orientation.HORIZONTAL, world);
+        Cell cellB = new Cell(10 * TILE_SIZE, 10 * TILE_SIZE, ecsEngine, world);
+        Cell cellD = new Cell(10 * TILE_SIZE, 100, ecsEngine, world);
+        Hallway hall4 = new Hallway(10 * TILE_SIZE, TILE_SIZE * 2, Orientation.HORIZONTAL, world);
+        Cell cellC = new Cell(20 * TILE_SIZE, 20 * TILE_SIZE, ecsEngine, world);
+        Cell cellE = new Cell(TILE_SIZE * 2, TILE_SIZE * 2, ecsEngine, world);
 
         Dungeon dungeon = new Dungeon(start, null, world);
 
@@ -145,7 +144,6 @@ public class GameScreen implements Screen {
         cellE.setWest(hall4);
         hall4.setWest(cellB);
         cellB.setSouth(cellD);
-
 
         dungeon.createCollisionBoxes();
 
@@ -173,16 +171,16 @@ public class GameScreen implements Screen {
                 dun.addEnemies();
 
             // Game is not paused, logic and rendering should be done
-            processInput();
             updateGameLogic(delta);
             drawGame();
 
-            hud.updateInventory(inventory);
-            hud.updateHealth(playerComponent.health);
         } else {
             // Game is paused, only rendering should be done
             drawPausedGame(delta);
         }
+
+
+        processInput();
 
         // Stage is drawn regardless
         stage.draw();
@@ -223,14 +221,24 @@ public class GameScreen implements Screen {
 
     private void processInput() {
         // If escape is pressed, the game is paused
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
-            pause();
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && !paused) {
+            // Wait until the menu is closed before player can open it
+            if (!menu.isClosing())
+                pause();
+        } else if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && paused) {
+            // Wait until the menu is opened before player can close it
+            if (!menu.isOpening())
+                resume();
+        }
     }
 
     private void updateGameLogic(float delta) {
         // Update entities and the physics world
         ecsEngine.update(delta);
-        world.step(1/60f, 6, 2);
+        world.step(TIME_STEP, 6, 2);
+
+        hud.updateInventory(inventory);
+        hud.updateHealth(playerComponent.health);
     }
 
     private void drawGame() {
@@ -245,10 +253,16 @@ public class GameScreen implements Screen {
 
         // Set up projection matrix for rendering system
         batch.setProjectionMatrix(cam.combined);
+
+        if (RogueTrails.DEBUG) {
+            // Show debug rendering if the game is run in debug mode
+            debugRenderer.render(world, cam.combined);
+        }
     }
 
     /**
      * A method to continue rendering the game while it is paused
+     *
      * @param delta Time between the previous and current call to render()
      */
     private void drawPausedGame(float delta) {
@@ -259,7 +273,7 @@ public class GameScreen implements Screen {
 
         if (RogueTrails.DEBUG) {
             // Show debug rendering if the game is run in debug mode
-            ecsEngine.getSystem(DebugRenderingSystem.class).update(delta);
+            debugRenderer.render(world, cam.combined);
         }
 
         shape.setProjectionMatrix(cam.combined);

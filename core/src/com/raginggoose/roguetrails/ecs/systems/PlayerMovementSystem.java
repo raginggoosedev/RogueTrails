@@ -16,12 +16,10 @@ import com.raginggoose.roguetrails.ecs.components.*;
  * The system used to move the player based on user input
  */
 public class PlayerMovementSystem extends IteratingSystem {
-    private final Dungeon dun;
     private final ComponentMapper<StateComponent> stateMapper;
 
-    public PlayerMovementSystem(Dungeon dun) {
+    public PlayerMovementSystem() {
         super(Family.all(PlayerComponent.class, TransformComponent.class, CollisionComponent.class).get());
-        this.dun = dun;
         stateMapper = Mapper.STATE_MAPPER;
     }
 
@@ -34,17 +32,8 @@ public class PlayerMovementSystem extends IteratingSystem {
         final StateComponent stateComponent = stateMapper.get(entity);
         Vector2 force = new Vector2(0, 0);
 
-
-        EnemyComponent enemyComponent = null;
-        if (collisionComponent.collisionBody != null) {
-            if (collisionComponent.collisionBody.getUserData() instanceof Entity) {
-                enemyComponent = Mapper.ENEMY_MAPPER.get((Entity) collisionComponent.collisionBody.getUserData());
-            }
-        }
-
-
-        if (enemyComponent == null) {
-            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        if (collisionComponent.pushStrength <= 0.0f) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W))
                 force.y = speed;
                 stateComponent.isLooping = true;
                 stateComponent.setState(StateComponent.STATE_UP);
@@ -70,8 +59,9 @@ public class PlayerMovementSystem extends IteratingSystem {
 
         } else {
             Vector2 pushDirection = collisionComponent.collisionNormal.cpy();
-            Vector2 pushImpulse = pushDirection.scl(collisionComponent.pushStrength);
-            collisionComponent.body.applyLinearImpulse(pushImpulse, collisionComponent.body.getWorldCenter(), true);
+            Vector2 pushImpulse = pushDirection.scl(-collisionComponent.pushStrength);
+            collisionComponent.body.setLinearVelocity(pushImpulse);
+            collisionComponent.pushStrength -= 0.5f;
             collisionComponent.collisionBody = null;
         }
 
