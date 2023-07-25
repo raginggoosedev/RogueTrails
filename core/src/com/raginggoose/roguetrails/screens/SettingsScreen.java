@@ -1,6 +1,7 @@
 package com.raginggoose.roguetrails.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -108,7 +109,7 @@ public class SettingsScreen implements Screen {
     @Override
     public void show() {
         // Do these every time the screen is shown
-        Gdx.input.setInputProcessor(stage);
+        Gdx.input.setInputProcessor(new InputMultiplexer(game.getInputManager(), stage));
         stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1)));
     }
 

@@ -1,14 +1,15 @@
 package com.raginggoose.roguetrails;
 
-import com.badlogic.gdx.Application;
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.raginggoose.roguetrails.audio.AudioManager;
+import com.raginggoose.roguetrails.input.InputManager;
 import com.raginggoose.roguetrails.loader.AssetLoader;
 import com.raginggoose.roguetrails.screens.GameScreen;
 import com.raginggoose.roguetrails.screens.MenuScreen;
@@ -29,6 +30,7 @@ public class RogueTrails extends Game {
     private SpriteBatch batch;
     private AssetLoader assetManager;
     private AudioManager audioManager;
+    private InputManager inputManager;
     private EnumMap<ScreenType, Screen> screenCache;
     private GamePreferences preferences;
     private Screen prevScreen;
@@ -38,7 +40,14 @@ public class RogueTrails extends Game {
         if (DEBUG) {
             Gdx.app.log(TAG, "------ Game is in DEBUG! ------");
             Gdx.app.setLogLevel(Application.LOG_DEBUG);
+
+            for (Controller controller : new Array.ArrayIterator<>(Controllers.getControllers())) {
+                Gdx.app.log(TAG, controller.getName());
+            }
         }
+
+        inputManager = new InputManager();
+        Gdx.input.setInputProcessor(inputManager);
 
         batch = new SpriteBatch();
         assetManager = new AssetLoader();
@@ -120,5 +129,9 @@ public class RogueTrails extends Game {
 
     public Screen getPrevScreen() {
         return prevScreen;
+    }
+
+    public InputManager getInputManager() {
+        return inputManager;
     }
 }

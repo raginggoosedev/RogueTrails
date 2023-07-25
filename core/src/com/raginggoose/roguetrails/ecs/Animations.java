@@ -11,8 +11,8 @@ public class Animations {
     public static float frameRate = 0.1f;
     public Animations(AssetLoader assetLoader) {
         playerAtlas = assetLoader.manager.get(AssetLoader.PLAYER_ATLAS);
-        upAnim = new Animation<>(frameRate, playerAtlas.findRegions("walk"));
-        stop = new Animation<>(frameRate, playerAtlas.findRegions("idle"));
+        upAnim = new Animation<>(frameRate, playerAtlas.findRegions("rightwalk"));
+        stop = new Animation<>(frameRate, playerAtlas.findRegions("idleright"));
     }
 
 }

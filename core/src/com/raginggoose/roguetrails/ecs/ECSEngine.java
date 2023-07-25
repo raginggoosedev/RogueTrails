@@ -30,11 +30,9 @@ public class ECSEngine extends PooledEngine {
     private final Entity player;
 
 
-    public ECSEngine(SpriteBatch batch, OrthographicCamera cam, AssetLoader assetLoader, World world) {
+    public ECSEngine(SpriteBatch batch, OrthographicCamera cam, AssetLoader assetLoader, World world, RogueTrails game) {
         this.world = world;
         new Animations(assetLoader);
-        if (RogueTrails.DEBUG)
-            this.addSystem(new DebugRenderingSystem(s, debug, world, cam));
 
         this.addSystem(new PlayerCameraSystem(cam));
 
@@ -49,7 +47,9 @@ public class ECSEngine extends PooledEngine {
         this.addSystem(new PhysicsSystem(world));
 
         player = this.createEntity();
-        this.addSystem(new InteractionSystem(player));
+        InteractionSystem interactionSystem = new InteractionSystem(player, game.getInputManager());
+        game.getInputManager().addInputListener(interactionSystem);
+        this.addSystem(interactionSystem);
     }
 
     /**
@@ -86,12 +86,6 @@ public class ECSEngine extends PooledEngine {
         sBuild.append("Player Position: ").append(transformComponent.position.toString()).append("\n");
         sBuild.append("Player Width & Height: ").append(transformComponent.width).append(", ").append(transformComponent.height).append("\n");
 
-        // Render Component
-        RenderComponent renderComponent = this.createComponent(RenderComponent.class);
-        renderComponent.shouldRender = true;
-        renderComponent.region = Animations.playerAtlas.findRegion("walk", 1);;
-        player.add(renderComponent);
-
         // State Component
         StateComponent stateComponent = this.createComponent(StateComponent.class);
         stateComponent.setState(StateComponent.STATE_STOP);
@@ -107,10 +101,12 @@ public class ECSEngine extends PooledEngine {
         animationComponent.animations.put(StateComponent.STATE_LEFT, Animations.upAnim);
         animationComponent.animations.put(StateComponent.STATE_RIGHT, Animations.upAnim);
 
+        player.add(animationComponent);
+
         // Render Component
         RenderComponent renderComponent = this.createComponent(RenderComponent.class);
         renderComponent.shouldRender = true;
-        renderComponent.region = playerAtlas.findRegion("rightwalk", 1);
+        renderComponent.region = Animations.playerAtlas.findRegion("rightwalk", 1);
         player.add(renderComponent);
 
         // Collision Component

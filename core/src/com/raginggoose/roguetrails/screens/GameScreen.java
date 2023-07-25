@@ -2,6 +2,7 @@ package com.raginggoose.roguetrails.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -87,14 +88,16 @@ public class GameScreen implements Screen {
 
 
         debugRenderer = new Box2DDebugRenderer();
-        ecsEngine = new ECSEngine(batch, cam, assetLoader, world);
+        ecsEngine = new ECSEngine(batch, cam, assetLoader, world, game);
         ecsEngine.createPlayer(32, 32, 32, 32, 0);
 
         dun = makeDungeon();
 
         spawnItems(dun.getStart(), 200, 100);
 
-        ecsEngine.addSystem(new PlayerMovementSystem());
+        PlayerMovementSystem playerMovementSystem = new PlayerMovementSystem();
+        game.getInputManager().addInputListener(playerMovementSystem);
+        ecsEngine.addSystem(playerMovementSystem);
 
         skin = new Skin(Gdx.files.internal("skin.json"));
 
@@ -113,7 +116,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(stage);
+        Gdx.input.setInputProcessor(new InputMultiplexer(game.getInputManager(), stage));
         stage.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1)));
 
         if (paused) {
