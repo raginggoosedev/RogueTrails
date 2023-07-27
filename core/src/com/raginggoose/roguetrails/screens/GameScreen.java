@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -30,6 +31,9 @@ import com.raginggoose.roguetrails.ecs.systems.PlayerMovementSystem;
 import com.raginggoose.roguetrails.ecs.systems.RenderingSystem;
 import com.raginggoose.roguetrails.hud.HUD;
 import com.raginggoose.roguetrails.hud.Menu;
+import com.raginggoose.roguetrails.input.GameInputListener;
+import com.raginggoose.roguetrails.input.GameKeys;
+import com.raginggoose.roguetrails.input.InputManager;
 import com.raginggoose.roguetrails.inventory.Inventory;
 import com.raginggoose.roguetrails.loader.AssetLoader;
 import com.raginggoose.roguetrails.room.Cell;
@@ -39,7 +43,7 @@ import com.raginggoose.roguetrails.room.Room;
 
 import static com.raginggoose.roguetrails.Constants.*;
 
-public class GameScreen implements Screen {
+public class GameScreen implements Screen, GameInputListener {
     private final RogueTrails game;
     private final SpriteBatch batch;
     private final ECSEngine ecsEngine;
@@ -72,6 +76,8 @@ public class GameScreen implements Screen {
         assetManager = game.getAssetManager().manager;
         assetLoader = game.getAssetManager();
         shape = new ShapeRenderer();
+
+        game.getInputManager().addInputListener(this);
 
         if (game.getPreferences().isMusicEnabled())
             game.getAudioManager().playAudio(AudioType.BACKGROUND);
@@ -182,9 +188,6 @@ public class GameScreen implements Screen {
             drawPausedGame(delta);
         }
 
-
-        processInput();
-
         // Stage is drawn regardless
         stage.draw();
         stage.act(delta);
@@ -220,19 +223,6 @@ public class GameScreen implements Screen {
         stage.dispose();
         world.dispose();
         debugRenderer.dispose();
-    }
-
-    private void processInput() {
-        // If escape is pressed, the game is paused
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && !paused) {
-            // Wait until the menu is closed before player can open it
-            if (!menu.isClosing())
-                pause();
-        } else if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE) && paused) {
-            // Wait until the menu is opened before player can close it
-            if (!menu.isOpening())
-                resume();
-        }
     }
 
     private void updateGameLogic(float delta) {
@@ -283,5 +273,58 @@ public class GameScreen implements Screen {
         shape.begin(ShapeRenderer.ShapeType.Line);
         dun.draw(shape);
         shape.end();
+    }
+
+    @Override
+    public void keyPressed(InputManager inputManager, GameKeys gameKey) {
+        // If escape is pressed, the game is paused
+        if (gameKey.equals(GameKeys.MENU) && !paused) {
+            // Wait until the menu is closed before player can open it
+            if (!menu.isClosing())
+                pause();
+        } else if (gameKey.equals(GameKeys.MENU)) {
+            // Wait until the menu is opened before player can close it
+            if (!menu.isOpening())
+                resume();
+        }
+    }
+
+    @Override
+    public void keyUp(InputManager inputManager, GameKeys gameKey) {
+
+    }
+
+    @Override
+    public void connected(Controller controller) {
+
+    }
+
+    @Override
+    public void disconnected(Controller controller) {
+
+    }
+
+    @Override
+    public boolean buttonDown(Controller controller, int buttonCode) {
+        if (buttonCode == controller.getMapping().buttonStart && !paused) {
+            // Wait until the menu is closed before player can open it
+            if (!menu.isClosing())
+                pause();
+        } else if (buttonCode == controller.getMapping().buttonStart) {
+            // Wait until the menu is opened before player can close it
+            if (!menu.isOpening())
+                resume();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean buttonUp(Controller controller, int buttonCode) {
+        return false;
+    }
+
+    @Override
+    public boolean axisMoved(Controller controller, int axisCode, float value) {
+        return false;
     }
 }
