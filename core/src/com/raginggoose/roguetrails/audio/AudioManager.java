@@ -6,6 +6,9 @@ import com.badlogic.gdx.audio.Sound;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.loader.AssetLoader;
 
+/**
+ * Handles audio for the program
+ */
 public class AudioManager {
     private static final String TAG = AudioManager.class.getSimpleName();
     private final AssetLoader assetLoader;
@@ -14,11 +17,19 @@ public class AudioManager {
     private AudioType currentMusicType;
     private Music currentMusic;
 
+    /**
+     * Creates a new audio manager for the game
+     * @param game the game class for the game
+     */
     public AudioManager(RogueTrails game) {
         assetLoader = game.getAssetManager();
         this.game = game;
     }
 
+    /**
+     * Plays an audio file
+     * @param type the type of audio (sound or music)
+     */
     public void playAudio(AudioType type) {
         try {
             // Check if the audio type is music
@@ -38,11 +49,15 @@ public class AudioManager {
 
             isPaused = false;
         } catch (Exception e) {
-            // Handle the exception appropriately, such as logging an error message or providing fallback options
+            // Log an error if the audio file cannot be played
             Gdx.app.error(TAG, "Error playing audio: " + e.getMessage());
         }
     }
 
+    /**
+     * Plays music audio
+     * @param type the type of audio (sound or music)
+     */
     private void playMusic(AudioType type) {
         // Set current type to the new type and play the new music
         currentMusicType = type;
@@ -52,8 +67,12 @@ public class AudioManager {
         currentMusic.play();
     }
 
+    /**
+     * Pauses the audio that is currently being played by the manager
+     */
     public void pauseMusic() {
         if (currentMusic != null) {
+            // If there is audio playing, then pause it
             currentMusic.pause();
             isPaused = true;
         } else {
@@ -62,6 +81,9 @@ public class AudioManager {
         }
     }
 
+    /**
+     * Resume audio that has been paused by the manager
+     */
     public void resumeMusic() {
         if (currentMusic != null) {
             currentMusic.play();
@@ -72,8 +94,12 @@ public class AudioManager {
         }
     }
 
+    /**
+     * Changes the volume that the manager plays audio at
+     */
     public void changeVolume() {
         if (currentMusic != null)
+            // Adjust the volume based off of the game preferences volume setting
             currentMusic.setVolume(game.getPreferences().getMusicVolume());
     }
 }

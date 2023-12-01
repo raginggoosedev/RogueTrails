@@ -5,6 +5,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Pool;
 
+/**
+ * Contains information about the entity's collisions
+ */
 public class CollisionComponent implements Component, Pool.Poolable {
     public Body body = null;
     public boolean collided = false;

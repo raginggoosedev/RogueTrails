@@ -3,6 +3,9 @@ package com.raginggoose.roguetrails.ecs.components;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Pool;
 
+/**
+ * Contains information about an item entity
+ */
 public class ItemComponent implements Component, Pool.Poolable {
     public static final int SHORT_SWORD = 0;
     public static final int BROAD_SWORD = 1;

@@ -5,12 +5,16 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.utils.Array;
 
+/**
+ * Handles input for the game
+ */
 public class InputManager implements InputProcessor {
     private final GameKeys[] keyMapping;
     private final boolean[] keyState;
     private final Array<GameInputListener> listeners;
 
     public InputManager() {
+        // Map each key to the keyMapping array
         keyMapping = new GameKeys[256];
         for (GameKeys keys : GameKeys.values()) {
             for (int code : keys.getKeyCode()) {
@@ -29,6 +33,7 @@ public class InputManager implements InputProcessor {
 
     public void removeInputListener(GameInputListener listener) {
         listeners.removeValue(listener, true);
+        Controllers.removeListener(listener);
     }
 
     @Override
