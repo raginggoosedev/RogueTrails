@@ -3,6 +3,9 @@ package com.raginggoose.roguetrails.ecs;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.raginggoose.roguetrails.ecs.components.*;
 
+/**
+ * Class containing static mappers for ECS components
+ */
 public class Mapper {
 
     // Component mappers for all the components available as statics

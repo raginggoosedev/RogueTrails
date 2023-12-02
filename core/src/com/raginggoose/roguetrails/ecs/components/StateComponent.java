@@ -3,6 +3,9 @@ package com.raginggoose.roguetrails.ecs.components;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Pool;
 
+/**
+ * Contains information about an entity's current state
+ */
 public class StateComponent implements Component, Pool.Poolable {
 
     public static final int STATE_UP = 1;

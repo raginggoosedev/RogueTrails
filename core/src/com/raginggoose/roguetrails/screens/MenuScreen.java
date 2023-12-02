@@ -1,8 +1,10 @@
 package com.raginggoose.roguetrails.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -11,21 +13,30 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.raginggoose.roguetrails.RogueTrails;
+import com.raginggoose.roguetrails.input.GameInputListener;
+import com.raginggoose.roguetrails.input.GameKeys;
+import com.raginggoose.roguetrails.input.InputManager;
+import com.raginggoose.roguetrails.input.MenuInputListener;
 import com.raginggoose.roguetrails.loader.AssetLoader;
 
 public class MenuScreen implements Screen {
     private final Stage stage;
     private final Skin skin;
     private final RogueTrails game;
+    private final Array<TextButton> buttons;
 
     public MenuScreen(RogueTrails game) {
         stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         skin = game.getAssetManager().manager.get(AssetLoader.GAME_SKIN);
         this.game = game;
+        buttons = new Array<>();
 
         Table table = new Table();
         table.setFillParent(true);
@@ -42,6 +53,7 @@ public class MenuScreen implements Screen {
                 stage.addAction(Actions.sequence(Actions.fadeOut(0.75f), Actions.run(() -> game.setScreen(ScreenType.GAME))));
             }
         });
+        buttons.add(textButton);
         table.add(textButton).padTop(40.0f).padBottom(10.0f).padLeft(140.0f).padRight(140.0f).expandX().expandY().fill();
 
         table.row().expandX().expandY();
@@ -53,6 +65,7 @@ public class MenuScreen implements Screen {
                 stage.addAction(Actions.sequence(Actions.fadeOut(0.75f), Actions.run(() -> game.setScreen(ScreenType.SETTINGS))));
             }
         });
+        buttons.add(textButton);
         table.add(textButton).padTop(10.0f).padBottom(10.0f).padLeft(140.0f).padRight(140.0f).expandX().expandY().fill();
 
         table.row().expandX().expandY();
@@ -64,8 +77,13 @@ public class MenuScreen implements Screen {
                 stage.addAction(Actions.sequence(Actions.fadeOut(0.75f), Actions.run(() -> Gdx.app.exit())));
             }
         });
+        buttons.add(textButton);
         table.add(textButton).padTop(10.0f).padBottom(20.0f).padLeft(140.0f).padRight(140.0f).expandX().expandY().fill();
         stage.addActor(table);
+
+        MenuInputListener menuInputListener = new MenuInputListener(buttons);
+        game.getInputManager().addInputListener(menuInputListener);
+
     }
 
     @Override
@@ -77,6 +95,7 @@ public class MenuScreen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
+
         stage.act(delta);
         stage.draw();
     }

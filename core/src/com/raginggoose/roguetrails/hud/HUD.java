@@ -9,12 +9,22 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.raginggoose.roguetrails.ecs.Mapper;
 import com.raginggoose.roguetrails.inventory.Inventory;
 
+/**
+ * The heads-up display which overlays the game
+ */
 public class HUD {
     private final HorizontalGroup healthGroup;
     private final HorizontalGroup inventoryGroup;
     private final Skin skin;
     private final Stage stage;
 
+    /**
+     * Creates a new HUD that will be rendered over the game
+     * @param inventory the players inventory
+     * @param skin the skin used for the scene2D objects
+     * @param hp the player's health
+     * @param stage the stage that the HUD acts/renders on
+     */
     public HUD(Inventory inventory, Skin skin, float hp, Stage stage) {
         this.skin = skin;
         this.stage = stage;

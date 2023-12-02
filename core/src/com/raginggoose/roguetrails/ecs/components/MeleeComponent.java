@@ -3,6 +3,9 @@ package com.raginggoose.roguetrails.ecs.components;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Pool;
 
+/**
+ * Contains information about an entity's melee capabilities
+ */
 public class MeleeComponent implements Component, Pool.Poolable {
     public float speed = 0.0f;
     public float damage = 0.0f;

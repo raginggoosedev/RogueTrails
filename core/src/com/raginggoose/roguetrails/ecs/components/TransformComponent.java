@@ -5,6 +5,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pool;
 
+/**
+ * Contains information about an entity's position and transformations
+ */
 public class TransformComponent implements Component, Pool.Poolable {
     public Vector3 position = new Vector3();
     public Vector2 prevPosition = new Vector2();

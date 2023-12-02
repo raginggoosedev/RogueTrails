@@ -6,9 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.raginggoose.roguetrails.RogueTrails;
 import com.raginggoose.roguetrails.b2d.BodyFactory;
@@ -18,7 +16,7 @@ import com.raginggoose.roguetrails.inventory.Inventory;
 import com.raginggoose.roguetrails.loader.AssetLoader;
 
 /**
- * Handles all the game's entities
+ * Handles all the game's entities using ECS
  */
 public class ECSEngine extends PooledEngine {
     public final static String TAG = ECSEngine.class.getSimpleName();
@@ -29,23 +27,27 @@ public class ECSEngine extends PooledEngine {
 
     private final Entity player;
 
-
+    /**
+     * Creates a new engine that handles the entity's in the game
+     * @param batch the spritebatch used for rendering
+     * @param cam the camera used in the game
+     * @param assetLoader the asset loader that is to be used to access resources
+     * @param world the world used for collisions
+     * @param game the game class for the game
+     */
     public ECSEngine(SpriteBatch batch, OrthographicCamera cam, AssetLoader assetLoader, World world, RogueTrails game) {
         this.world = world;
         new Animations(assetLoader);
 
+        // Add systems to the engine
         this.addSystem(new PlayerCameraSystem(cam));
-
         this.addSystem(new EnemyMovementSystem());
-
         this.addSystem(new RenderingSystem(batch));
-
         this.addSystem(new CollisionSystem());
-
         this.addSystem(new AnimationSystem());
-
         this.addSystem(new PhysicsSystem(world));
 
+        // Create the player, then add the interaction system
         player = this.createEntity();
         InteractionSystem interactionSystem = new InteractionSystem(player, game.getInputManager());
         game.getInputManager().addInputListener(interactionSystem);
@@ -187,6 +189,15 @@ public class ECSEngine extends PooledEngine {
         Gdx.app.debug(TAG, sBuild.toString());
     }
 
+    /**
+     * Creates an item entity with the specified parameters
+     * @param x the x position of the item
+     * @param y the y position of the item
+     * @param w the width of the item
+     * @param h the height of the item
+     * @param drawOrder the layer that the item should be drawn on
+     * @param type the type of item this item is
+     */
     public void createItem(int x, int y, int w, int h, int drawOrder, int type) {
         Entity item = this.createEntity();
 
@@ -229,6 +240,7 @@ public class ECSEngine extends PooledEngine {
             sBuild.append(itemComponent).append(" Debug Color: ").append(ITEM_DEBUG_COLOUR).append("\n");
         }
 
+        // Item component (and applicable additional components based on type)
         switch (type) {
             case ItemComponent.SHORT_SWORD:
                 MeleeComponent meleeComponent = this.createComponent(MeleeComponent.class);
@@ -274,6 +286,10 @@ public class ECSEngine extends PooledEngine {
         Gdx.app.debug(TAG, sBuild.toString());
     }
 
+    /**
+     * Gets the player used in the game
+     * @return the player entity
+     */
     public Entity getPlayer() {
         return player;
     }

@@ -3,6 +3,9 @@ package com.raginggoose.roguetrails.input;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 
+/**
+ * Listens for input from the user
+ */
 public interface GameInputListener extends ControllerListener {
     public abstract void keyPressed(InputManager inputManager, GameKeys gameKey);
 

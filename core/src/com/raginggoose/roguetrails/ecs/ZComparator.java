@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import java.util.Comparator;
 
 /**
- * Compares the z coordinates of two entities
+ * A Z coordinate comparator
  */
 public class ZComparator implements Comparator<Entity> {
     public ZComparator() {
