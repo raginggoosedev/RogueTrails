@@ -1,0 +1,92 @@
+@startuml
+left to right direction
+skinparam UsecaseWidth 160
+skinparam UseCasePadding 20
+skinparam packageStyle rectangle
+
+actor Player
+
+'──────────── Game System ────────────
+rectangle "Game System" {
+
+'──────────── Menu ────────────
+package "Menu & Meta" {
+  (Start New Game)
+  (Load Progress)
+  (Save Progress)
+  (Exit Game)
+  (View High Scores)
+  (Enter Settings)
+}
+
+package "Settings" {
+  (Change Settings)
+  (View Controls)
+  (Adjust Volume)
+}
+
+
+  package "Dungeon Flow" {
+    (Enter Dungeon)
+    (Exit Dungeon)
+    (Generate Dungeon)
+    (Update Score)
+  }
+
+  package "Combat" {
+    (Fight Mobs)
+    (Fight Boss)
+    (Use Ability)
+    (Use Item)
+    (Apply Item Effect)
+  }
+
+  package "Progression" {
+    (Collect Loot)
+    (Generate Drop)
+    (Gain XP / Level Up)
+    (Stat Increase)
+    (Unlock Ability)
+    (Equip/Upgrade Gear)
+  }
+}
+
+'──────────── Relationships ────────────
+
+' Menu
+Player --> (Start New Game)
+Player --> (Load Progress)
+Player --> (Save Progress)
+Player --> (Exit Game)
+Player --> (View High Scores)
+Player --> (Enter Settings)
+
+' Settings
+Player --> (Change Settings)
+Player --> (View Controls)
+Player --> (Adjust Volume)
+
+' Dungeon Flow
+Player --> (Enter Dungeon)
+(Enter Dungeon) --> (Generate Dungeon) : <<include>>
+
+Player --> (Exit Dungeon)
+(Exit Dungeon) --> (Update Score) : <<include>>
+
+' Combat
+Player --> (Fight Mobs)
+(Fight Boss) .> (Fight Mobs) : <<extend>>
+Player --> (Use Ability)
+Player --> (Use Item)
+(Use Item) --> (Apply Item Effect) : <<include>>
+
+' Progression
+Player --> (Collect Loot)
+(Collect Loot) --> (Generate Drop) : <<include>>
+
+Player --> (Gain XP / Level Up)
+(Gain XP / Level Up) --> (Stat Increase) : <<include>>
+(Gain XP / Level Up) --> (Unlock Ability) : <<include>>
+
+Player --> (Equip/Upgrade Gear)
+@enduml
