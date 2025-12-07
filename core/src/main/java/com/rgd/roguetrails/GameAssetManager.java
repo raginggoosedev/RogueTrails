@@ -8,6 +8,7 @@ public class GameAssetManager implements Disposable {
 
     public GameAssetManager() {
         manager = new AssetManager();
+        //TODO Build assetmanager
     }
 
     @Override
