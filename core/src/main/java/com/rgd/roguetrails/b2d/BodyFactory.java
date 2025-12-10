@@ -1,14 +1,14 @@
 
 package com.rgd.roguetrails.b2d;
 
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
+
+import static com.rgd.roguetrails.utils.Constants.PPM;
 
 /**
  * @author Michael (ExplorerDonutz) Quick
  * @version 1.0, 2025/12/07
- * A class used to create all physics bodies in the games world, following a singleton, abstract factory, and builder design pattern
+ * A class used to create all physics bodies in the games world, following a singleton design pattern
  */
 public class BodyFactory {
     private static BodyFactory bf;
@@ -38,7 +38,23 @@ public class BodyFactory {
     }
 
     public Body makeBox(float posX, float posY, float width, float height, BodyDef.BodyType bodyType) {
-        //TODO complete
-        return null;
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = bodyType;
+        bodyDef.position.set(posX / PPM, posY / PPM);
+        bodyDef.fixedRotation = true;
+
+        Body body = world.createBody(bodyDef);
+
+        PolygonShape poly = new PolygonShape();
+
+        // SetAsBox uses half width/height
+        poly.setAsBox(width / 2f / PPM, height / 2f / PPM);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = poly;
+        body.createFixture(fixtureDef);
+        poly.dispose();
+
+        return body;
     }
 }
