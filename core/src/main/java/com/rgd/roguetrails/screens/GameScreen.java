@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.rgd.roguetrails.RogueTrails;
 import com.rgd.roguetrails.b2d.BodyFactory;
+import com.rgd.roguetrails.dungeon.Hallway;
 import com.rgd.roguetrails.utils.Constants;
 
 import static com.rgd.roguetrails.utils.Constants.PPM;
@@ -46,8 +47,8 @@ public class GameScreen extends BaseScreen {
         BodyFactory bodyFactory = BodyFactory.getInstance(world);
 
         // Test boxes
-        bodyFactory.makeBox(Gdx.graphics.getWidth() / 2f, 16, Gdx.graphics.getWidth(), 32, BodyDef.BodyType.StaticBody);
-        bodyFactory.makeBox(16, (Gdx.graphics.getHeight() - 32) / 2f + 32, 32, Gdx.graphics.getHeight() - 32, BodyDef.BodyType.StaticBody);
+        Hallway h = new Hallway(0, 0, Constants.HALLWAY_WIDTH, Constants.HALLWAY_LENGTH, world, 2, false);
+
     }
 
     @Override

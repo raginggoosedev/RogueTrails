@@ -10,6 +10,7 @@ import com.rgd.roguetrails.ecs.entities.Player;
 import com.rgd.roguetrails.ecs.systems.PhysicsSystem;
 import com.rgd.roguetrails.ecs.systems.PlayerCameraSystem;
 import com.rgd.roguetrails.ecs.systems.PlayerMovementSystem;
+import com.rgd.roguetrails.utils.Constants;
 
 /**
  * @author Michael (ExplorerDonutz) Quick
@@ -28,7 +29,7 @@ public class ECSEngine extends PooledEngine {
         this.addSystem(new PlayerCameraSystem(camera));
 
         // Player Entity
-        Entity player = new Player(world, 32, 32);
+        Entity player = new Player(world, Constants.PLAYER_ORIGIN_X, Constants.PLAYER_ORIGIN_Y);
         this.addEntity(player);
     }
 }
